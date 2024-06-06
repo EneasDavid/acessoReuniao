@@ -1,6 +1,7 @@
 const Services = require('./services.js');
 const dataSource = require('../models/index.js');
 const z=require('zod');
+const { Sequelize } = require('sequelize');
 
 class UserServices extends Services {
     constructor() {
@@ -29,7 +30,7 @@ class UserServices extends Services {
 
     async login(login, senha) {
         try{
-            return dataSource.User.findOne({ where: { login, senha } });
+            return dataSource.User.findOne({ where: { login: { [Sequelize.Op.eq]: login }, senha: { [Sequelize.Op.eq]: senha }}});
         }catch(error){
             await this.salvarErro(error.name, error.message);
             throw error;
