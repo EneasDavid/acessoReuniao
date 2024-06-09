@@ -8,6 +8,7 @@ class recepcionistaServices extends Services{
     constructor(){
         super('Recepcionista',z.object({
             login:z.string().min(5,{message:"O campo de login necessita de NO MINIMO 5 caracteres"}).max(255,{message:"O campo de login necessita de NO MAXIMO 255 caracteres"}),
+            //Corrigir o zod para bater com no minimo 38 caracteres
             senha:z.string().min(8,{message:"O campo de senha necessita de NO MINIMO 8 caracteres"}).max(255,{message:"O campo de senha necessita de NO MAXIMO 255 caracteres"}),
             nome:z.string().min(5,{message:"O campo de nome necessita de NO MINIMO 5 caracteres"}).max(255,{message:"O campo de nome necessita de NO MAXIMO 255 caracteres"}),
             sobrenome:z.string().min(5,{message:"O campo de sobrenome necessita de NO MINIMO 5 caracteres"}).max(255,{message:"O campo de sobrenome necessita de NO MAXIMO 255 caracteres"}),
@@ -17,14 +18,16 @@ class recepcionistaServices extends Services{
     }
 
     async gerarCaracteres(){
+        //Gestão de memoria: Não precisa da porra dessa variavel, apenas o return
         let result = '';
         for(let i = 0; i < 30; i++){
+            //se tem caminhos mais simples pra gerar isso de uma vez sem usar for, e assugurando que sejam diferentes
             let ascii = Math.floor(Math.random() * 256);
             result += String.fromCharCode(ascii);
         }
         return result;
     }
-    
+    //???????????????
     async fazerSalt(senha){
         let salt = await this.gerarCaracteres();
         let salted = salt + senha;
@@ -45,11 +48,16 @@ class recepcionistaServices extends Services{
 
     async criarRecepcioninsta(novoRegistro){
         try{
+            //tudo isso deveria ser um bloco de só, e em caso de serem funções diferentes, deve se auto chamar
+            //em correcia de clen code, compreendo isso, mas clenCode de cu é rola
+            //Faça o que cê sabe OU PERGNTE ESSE CARALHO
             let salt = await this.gerarCaracteres();
             let salted = salt + novoRegistro.senha;
             let hashed = await this.fazerHash(salted);
-            novoRegistro.senha = salt + hashed;
+            //}
+            novoRegistro.senha = salt + hashed; //?????? TU fez isso TRES VEZES Em PARTES DIFERENTS
             return await dataSource.Recepcionista.create(novoRegistro);
+            //salt na tabela MEU CU 
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'criaRecepcioninsta');
             throw error;
@@ -57,8 +65,9 @@ class recepcionistaServices extends Services{
     }
     
     async buscarUsuario(login) {
-    return await dataSource.Recepcionista.findOne({ where: { login: { [Sequelize.Op.eq]: login }}});
+        return await dataSource.Recepcionista.findOne({ where: { login: { [Sequelize.Op.eq]: login }}});
     }
+    
 
     async verificarSenha(senha, senhaHashed) {
         let salt = senhaHashed.substring(0, 30);
