@@ -8,8 +8,7 @@ class recepcionistaServices extends Services{
     constructor(){
         super('Recepcionista',z.object({
             login:z.string().min(5,{message:"O campo de login necessita de NO MINIMO 5 caracteres"}).max(255,{message:"O campo de login necessita de NO MAXIMO 255 caracteres"}),
-            //Corrigir o zod para bater com no minimo 38 caracteres
-            senha:z.string().min(8,{message:"O campo de senha necessita de NO MINIMO 8 caracteres"}).max(255,{message:"O campo de senha necessita de NO MAXIMO 255 caracteres"}),
+            senha:z.string().min(38,{message:"O campo de senha necessita de NO MINIMO 8 caracteres"}).max(255,{message:"O campo de senha necessita de NO MAXIMO 255 caracteres"}),
             nome:z.string().min(5,{message:"O campo de nome necessita de NO MINIMO 5 caracteres"}).max(255,{message:"O campo de nome necessita de NO MAXIMO 255 caracteres"}),
             sobrenome:z.string().min(5,{message:"O campo de sobrenome necessita de NO MINIMO 5 caracteres"}).max(255,{message:"O campo de sobrenome necessita de NO MAXIMO 255 caracteres"}),
             ativo:z.boolean(),
@@ -18,20 +17,7 @@ class recepcionistaServices extends Services{
     }
 
     async gerarCaracteres(){
-        //Gestão de memoria: Não precisa da porra dessa variavel, apenas o return
-        let result = '';
-        for(let i = 0; i < 30; i++){
-            //se tem caminhos mais simples pra gerar isso de uma vez sem usar for, e assugurando que sejam diferentes
-            let ascii = Math.floor(Math.random() * 256);
-            result += String.fromCharCode(ascii);
-        }
-        return result;
-    }
-    //???????????????
-    async fazerSalt(senha){
-        let salt = await this.gerarCaracteres();
-        let salted = salt + senha;
-        return { salt, salted };
+        return Array.from(crypto.randomBytes(30), byte => String.fromCharCode(byte)).join('');
     }
 
     async fazerHash(senhaSalted){
@@ -40,49 +26,42 @@ class recepcionistaServices extends Services{
         return hash.digest('hex');
     }
     
-    async fazerMatch(senha, salt, storedHash){
-        let salted = salt + senha;
-        let hashed = await this.fazerHash(salted);
-        return hashed === storedHash;
-    }
-
-    async criarRecepcioninsta(novoRegistro){
+    async criarRecepcionista(novoRegistro){
         try{
-            //tudo isso deveria ser um bloco de só, e em caso de serem funções diferentes, deve se auto chamar
-            //em correcia de clen code, compreendo isso, mas clenCode de cu é rola
-            //Faça o que cê sabe OU PERGNTE ESSE CARALHO
             let salt = await this.gerarCaracteres();
-            let salted = salt + novoRegistro.senha;
-            let hashed = await this.fazerHash(salted);
-            //}
-            novoRegistro.senha = salt + hashed; //?????? TU fez isso TRES VEZES Em PARTES DIFERENTS
-            return await dataSource.Recepcionista.create(novoRegistro);
-            //salt na tabela MEU CU 
+            let hashed = await this.fazerHash(salt + novoRegistro.senha);
+            novoRegistro.senha = hashed;
+            let novoRecepcionista = await dataSource.Recepcionista.create(novoRegistro);
+            await dataSource.saltSenha.create({ idRecepcionista: novoRecepcionista.id, salt: salt });
+            return novoRecepcionista;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'criaRecepcioninsta');
             throw error;
         }
     }
-    
-    async buscarUsuario(login) {
+
+    async buscarUsuario(login){
         return await dataSource.Recepcionista.findOne({ where: { login: { [Sequelize.Op.eq]: login }}});
     }
     
-
-    async verificarSenha(senha, senhaHashed) {
-        let salt = senhaHashed.substring(0, 30);
-        let storedHash = senhaHashed.substring(30);
-        return await this.fazerMatch(senha, salt, storedHash);
+    async buscarSalt(idRecepcionista){
+        let saltSenha = await dataSource.saltSenha.findOne({ where: { idRecepcionista: { [Sequelize.Op.eq]: idRecepcionista }}});
+        return saltSenha ? saltSenha.salt : null;
     }
-
-    async login(login, senha) {
+    
+    async verificarSenha(senha, senhaHashed, idRecepcionista){
+        let salt = await this.buscarSalt(idRecepcionista);
+        if (!salt) throw new Error('Salt não encontrado');
+        let hashed = await this.fazerHash(salt + senha);
+        return hashed === senhaHashed;
+    }
+    
+    async login(login, senha){
         try{
             let usuario = await this.buscarUsuario(login);
             if (!usuario) throw new Error('Usuário não encontrado');
-
-            let senhaValida = await this.verificarSenha(senha, usuario.senha);
+            let senhaValida = await this.verificarSenha(senha, usuario.senha, usuario.id);
             if (!senhaValida) throw new Error('Senha incorreta');
-
             return usuario;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'login');

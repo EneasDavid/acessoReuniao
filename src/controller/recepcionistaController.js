@@ -10,7 +10,7 @@ class RecepcionistaController extends Controller{
     async cria(req, res){
         const novoRegistro = req.body;
         try{
-            const novoRegistroCriado = await recepcionistaServices.criarRecepcioninsta(novoRegistro);
+            const novoRegistroCriado = await recepcionistaServices.criarRecepcionista(novoRegistro);
             return res.status(200).json(novoRegistroCriado);
         }catch(erro){
             return res.status(500).json({error:erro.name, message:erro.message, model:'Recepcionista', method:'cria'});

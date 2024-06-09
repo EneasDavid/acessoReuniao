@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'nivelAcesso',
         as: 'nivelAcessos'
       });
+      Recepcionista.hasOne(models.saltSenha, {
+        foreignKey: 'idRecepcionista',
+        as: 'saltSenha',
+        onDelete: 'CASCADE'
+      });
     }
   }
   Recepcionista.init({
