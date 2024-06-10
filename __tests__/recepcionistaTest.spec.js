@@ -11,7 +11,35 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
         ativo: true,
         nivelAcesso: 2
     };
-
+    const insercaoPadrao=[
+        {
+        login: "garota de ipanema",
+        senha: "quase me chamou de amor",
+        nome:"Bruna",
+        sobrenome:"Castro",
+        ativo: true,
+        nivelAcesso: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+        },{
+            login: "chefion",
+            senha: "culpado de amor",
+            nome:"Ulpio",
+            sobrenome:"Neto",
+            ativo: true,
+            nivelAcesso: 2,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }
+    ];
+    insercaoPadrao.forEach(recepcionista => {
+        it('Deve criar os usuarioas padrão do sistema', async()=>{
+            const response=await request(app)           
+                .post('/recepcionista')
+                .send(recepcionista);
+            expect(response.status).toBe(200);
+        });
+    });
     it('Deve listar todos os recepcionistas', async () => {
         const response = await request(app).get('/recepcionista');
         expect(response.status).toBe(200);
