@@ -3,6 +3,7 @@ const dataSource = require('../models/index.js');
 const z=require('zod');
 const { Sequelize } = require('sequelize');
 const crypto = require('crypto');
+const jwt=require('jsonwebtoken');
 
 class recepcionistaServices extends Services{
     constructor(){
@@ -62,7 +63,9 @@ class recepcionistaServices extends Services{
             if (!usuario) throw new Error('Usuário não encontrado');
             let senhaValida = await this.verificarSenha(senha, usuario.senha, usuario.id);
             if (!senhaValida) throw new Error('Senha incorreta');
-            return usuario;
+            //ALterar para inserir o token
+            //let token = await this.gerarToken(usuario.id);
+            return true;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'login');
             throw error;

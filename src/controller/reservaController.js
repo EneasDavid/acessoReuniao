@@ -1,5 +1,5 @@
 const Controller=require('./controller.js');
-const ReservaServices=require('../services/ReservaServices.js');
+const ReservaServices=require('../services/reservaServices.js');
 const reservaServices=new ReservaServices();
 
 class ReservaController extends Controller{

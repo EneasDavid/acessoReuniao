@@ -1,5 +1,5 @@
 const Controller=require('./controller.js');
-const EstadoSalaServices=require('../services/EstadoSalaServices.js');
+const EstadoSalaServices=require('../services/estadoSalaServices.js');
 const estadoSalaServices=new EstadoSalaServices();
 
 class EstadoSalaController extends Controller{
