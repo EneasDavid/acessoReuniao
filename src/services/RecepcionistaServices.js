@@ -1,8 +1,6 @@
 const Services=require("./services.js");
-const dataSource = require('../models/index.js');
+const hashServices=require("./hashServices.js")
 const z=require('zod');
-const { Sequelize } = require('sequelize');
-const crypto = require('crypto');
 const jwt=require('jsonwebtoken');
 
 class recepcionistaServices extends Services{
@@ -15,54 +13,28 @@ class recepcionistaServices extends Services{
             ativo:z.boolean(),
             nivelAcesso:z.number().int({message:"O campo de nivel de acesso necessita ser um numero inteiro"}).positive({message:"O campo de nivel de acesso necessita ser um numero inteiro positivo"}),
         }));
+        this.hashService = new hashServices();
     }
 
-    async gerarCaracteres(){
-        return Array.from(crypto.randomBytes(30), byte => String.fromCharCode(byte)).join('');
-    }
-
-    async fazerHash(senhaSalted){
-        let hash = crypto.createHash('sha256');
-        hash.update(senhaSalted);
-        return hash.digest('hex');
-    }
-    
     async criarRecepcionista(novoRegistro){
         try{
-            let salt = await this.gerarCaracteres();
-            let hashed = await this.fazerHash(salt + novoRegistro.senha);
+            let salt = await this.hashService.gerarCaracteres();
+            let hashed = await this.hashService.gerarHash(salt + novoRegistro.senha);
             novoRegistro.senha = hashed;
-            let novoRecepcionista = await dataSource.Recepcionista.create(novoRegistro);
-            await dataSource.saltSenha.create({ idRecepcionista: novoRecepcionista.id, salt: salt });
+            let novoRecepcionista = await this.criaRegistro(novoRegistro);
+            await this.criaRegistro({ idRecepcionista: novoRecepcionista.id, salt: salt });
             return novoRecepcionista;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'criaRecepcioninsta');
             throw error;
         }
     }
-
-    async buscarUsuario(login){
-        return await dataSource.Recepcionista.findOne({ where: { login: { [Sequelize.Op.eq]: login }}});
-    }
-    
-    async buscarSalt(idRecepcionista){
-        let saltSenha = await dataSource.saltSenha.findOne({ where: { idRecepcionista: { [Sequelize.Op.eq]: idRecepcionista }}});
-        return saltSenha ? saltSenha.salt : null;
-    }
-    
-    async verificarSenha(senha, senhaHashed, idRecepcionista){
-        let salt = await this.buscarSalt(idRecepcionista);
-        if (!salt) throw new Error('Salt não encontrado');
-        let hashed = await this.fazerHash(salt + senha);
-        return hashed === senhaHashed;
-    }
     
     async login(login, senha){
         try{
-            let usuario = await this.buscarUsuario(login);
-            if (!usuario) throw new Error('Usuário não encontrado');
-            let senhaValida = await this.verificarSenha(senha, usuario.senha, usuario.id);
-            if (!senhaValida) throw new Error('Senha incorreta');
+            let usuario = await this.pegaUmRegistro(login);
+            let senhaValida = await this.hashService.verificarSenha(senha, usuario.senha, usuario.id);
+            if(!usuario || !senhaValida) throw new Error('Login ou senha inválidos');
             //ALterar para inserir o token
             //let token = await this.gerarToken(usuario.id);
             return true;
