@@ -13,14 +13,12 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
     };
     const insercaoPadrao=[
         {
-        login: "garota de ipanema",
-        senha: "quase me chamou de amor",
-        nome:"Bruna",
-        sobrenome:"Castro",
-        ativo: true,
-        nivelAcesso: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
+            login: "garota de ipanema",
+            senha: "quase me chamou de amor",
+            nome:"Bruna",
+            sobrenome:"Castro",
+            ativo: true,
+            nivelAcesso: 1,
         },{
             login: "chefion",
             senha: "culpado de amor",
@@ -28,8 +26,6 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
             sobrenome:"Neto",
             ativo: true,
             nivelAcesso: 2,
-            createdAt: new Date(),
-            updatedAt: new Date()
         }
     ];
     insercaoPadrao.forEach(recepcionista => {
@@ -58,7 +54,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
         expect(response.status).toBe(200); 
     });
 
-    it('Deve realizar login de recepcionista', async () => {
+    it.only('Deve realizar login de recepcionista', async () => {
         const response = await request(app)
             .post('/recepcionista/login')
             .send({ login: 'Enéas é foda', senha: 'eneasEfoda' });
@@ -104,7 +100,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
             expect(response.status).toBe(500);
         });
     });
-
+    
     it('Deve deletar um recepcionista existente', async () => {
         const response = await request(app).delete('/recepcionista/3'); 
         expect(response.status).toBe(200); 

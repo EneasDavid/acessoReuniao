@@ -1,5 +1,5 @@
 const Controller = require('./controller.js');
-const HashServices = require('../services/hashServices.js');
+const HashServices = require('../services/saltSenha.js');
 const hashServices = new HashServices();
 
 class HashController extends Controller {

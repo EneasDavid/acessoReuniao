@@ -51,7 +51,6 @@ class Services {
 
     async criaRegistro(dados) {
         try {
-            console.log(dados);
             await this.validarDados(dados);
             return await dataSource[this.model].create(dados);
         } catch (error) {
