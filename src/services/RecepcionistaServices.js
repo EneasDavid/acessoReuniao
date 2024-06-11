@@ -42,7 +42,7 @@ class recepcionistaServices extends Services{
             if (!senhaValida) throw new Error('Senha ou login inválidos');
     
             // Gerar token JWT
-            const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '86,400s' }); 
+            const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '86400s' }); 
             return token;
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'login');

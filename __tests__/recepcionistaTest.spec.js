@@ -75,7 +75,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
     it('Deve realizar login de recepcionista', async()=>{
         const response = await request(app)
             .post('/recepcionista/login')
-            .send({ login: 'Enéas é foda', senha: 'eneasEfoda' })
+            .send({ login: 'garota de ipanema', senha: 'quase me chamou de amor' })
         expect(response.status).toBe(200);
     });
 

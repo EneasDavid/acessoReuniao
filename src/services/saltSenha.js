@@ -40,7 +40,6 @@ class hashServices extends Services{
         try{
             console.log(idRecepcionista);
             let salt = await this.buscarSalt(idRecepcionista);
-            console.log(salt);
             if (!salt) throw new Error('Salt não encontrado');
             let hashed = await this.gerarHash(salt + senha);
             return hashed === senhaHashed;
