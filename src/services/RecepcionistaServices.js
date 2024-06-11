@@ -4,7 +4,7 @@ const hashServices=require("./saltSenha.js")
 const Recepcionista=require("../models").Recepcionista;
 const z=require('zod');
 const jwt=require('jsonwebtoken');
-
+const palavraPasse='Enéas é foda';
 class recepcionistaServices extends Services{
     constructor(){
         super('Recepcionista',z.object({
@@ -32,20 +32,24 @@ class recepcionistaServices extends Services{
         }
     }
     
-    async login(login, senha){
-        try{
-            let usuario = await Recepcionista.findOne({where:{login}});
+
+    async login(login, senha) {
+        try {
+            let usuario = await Recepcionista.findOne({ where: { login } });
+            if (!usuario) throw new Error('Login inválido ou inexistente');
+    
             let senhaValida = await this.hashService.verificarSenha(senha, usuario.senha, usuario.id);
-            if(!usuario)throw new Error('Login inválidos'); 
-            if(!senhaValida) throw new Error('senha inválidos');
-            //ALterar para inserir o token
-            //let token = await this.gerarToken(usuario.id);
-            return true;
-        }catch(error){
+            if (!senhaValida) throw new Error('Senha ou login inválidos');
+    
+            // Gerar token JWT
+            const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '86,400s' }); 
+            return token;
+        } catch (error) {
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'login');
             throw error;
         }
     }
+    
 }
 
 module.exports=recepcionistaServices;
