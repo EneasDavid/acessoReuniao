@@ -9,18 +9,35 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+  
       idSala: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references:{
+          model: 'salas',
+          key: 'id'
+        },
       },
-      idUsuario: {
+     idUsuario: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references:{
+          model: 'usuarios',
+          key: 'id'
+        },
       },
+  
       idRecepcionista: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        /*
+        references:{
+          model: 'recepcionistas',
+          key: 'id'
+        },
+        */        
       },
+
       dataReservada: {
         type: Sequelize.STRING,
         allowNull: false

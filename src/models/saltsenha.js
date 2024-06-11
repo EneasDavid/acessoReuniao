@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       saltSenha.belongsTo(models.Recepcionista,{
         foreignKey: 'idRecepcionista',
-        as: 'recepcionistas'
+        as: 'recepcionistas',
       });
     }
   }

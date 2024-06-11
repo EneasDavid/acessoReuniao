@@ -36,7 +36,8 @@ class recepcionistaServices extends Services{
         try{
             let usuario = await Recepcionista.findOne({where:{login}});
             let senhaValida = await this.hashService.verificarSenha(senha, usuario.senha, usuario.id);
-            if(!usuario || !senhaValida) throw new Error('Login ou senha inválidos');
+            if(!usuario)throw new Error('Login inválidos'); 
+            if(!senhaValida) throw new Error('senha inválidos');
             //ALterar para inserir o token
             //let token = await this.gerarToken(usuario.id);
             return true;

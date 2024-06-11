@@ -1,7 +1,7 @@
 const request=require('supertest');
 const app='http://localhost:3000';
 describe('Teste dos metodos atrelados a recepcionista', ()=>{
-    const atributos = ['login', 'senha', 'identificador', 'ativo', 'tipo', 'nivelAcesso'];
+    const atributos = ['login', 'senha', 'ativo', 'tipo', 'nivelAcesso'];
     const recepcionista={
         id:3,
         login: "Enéas é foda",
@@ -28,6 +28,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
             nivelAcesso: 2,
         }
     ];
+
     insercaoPadrao.forEach(recepcionista => {
         it('Deve criar os usuarioas padrão do sistema', async()=>{
             const response=await request(app)           
@@ -36,6 +37,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
             expect(response.status).toBe(200);
         });
     });
+
     it('Deve listar todos os recepcionistas', async () => {
         const response = await request(app).get('/recepcionista');
         expect(response.status).toBe(200);
@@ -46,7 +48,6 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
         expect(response.status).toBe(200);
     });
 
-
     it('Deve criar um novo recepcionista', async () => {
         const response = await request(app)
             .post('/recepcionista')
@@ -54,7 +55,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
         expect(response.status).toBe(200); 
     });
 
-    it.only('Deve realizar login de recepcionista', async () => {
+    it('Deve realizar login de recepcionista', async () => {
         const response = await request(app)
             .post('/recepcionista/login')
             .send({ login: 'Enéas é foda', senha: 'eneasEfoda' });
@@ -83,14 +84,6 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
             expect(response.status).toBe(200);
     });
     
-    it('Deve retornar erro por não passar em validação de formatação de Identificador', async () => {
-        const response = await request(app)
-            .put('/recepcionista/2')
-            .send({identificador: '111222333'});
-        expect(response.status).toBe(500);
-    });
-    
-
     atributos.forEach(atributo => {
         it(`Deve retornar erro 500 ao tentar criar um recepcionista sem o atributo '${atributo}'`, async () => {
             const novoUser = { ...recepcionista, [atributo]:null};

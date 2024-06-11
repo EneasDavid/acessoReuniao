@@ -11,7 +11,12 @@ module.exports = {
       },
       idRecepcionista: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'recepcionistas',
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
       },
       salt: {
         type: Sequelize.STRING,

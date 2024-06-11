@@ -11,11 +11,21 @@ module.exports = {
       },
       idResponsavel: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        /*
+        references:{
+          model: 'recepcionistas',
+          key: 'id'
+        }
+        */
       },
       idReservaMotivo: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references:{
+          model: 'reservas',
+          key: 'id'
+        }
       },
       codBloqueio: {
         type: Sequelize.STRING,

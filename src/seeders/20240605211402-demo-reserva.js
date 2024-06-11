@@ -42,7 +42,7 @@ module.exports = {
         updatedAt: new Date()
       },{
         idSala: 4,
-        idUsuario: 4,
+        idUsuario: 1,
         idRecepcionista: 2,
         dataReservada: new Date(),
         horaInicio: new Date(), //pegar apenas horas e minutos

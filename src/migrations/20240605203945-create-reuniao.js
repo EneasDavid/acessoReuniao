@@ -14,8 +14,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       idParticipante: {
-        type: Sequelize.STRING, // Use Sequelize.JSON se for suportado
-        allowNull: false
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

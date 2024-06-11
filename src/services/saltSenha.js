@@ -1,6 +1,7 @@
 const Services=require("./services.js");
 const crypto = require('crypto');
 const z=require('zod');
+const hash=require("../models").saltSenha;
 
 class hashServices extends Services{
     constructor(){
@@ -27,7 +28,7 @@ class hashServices extends Services{
     
     async buscarSalt(idRecepcionista){
         try{
-            let saltSenha = await this.pegaUmRegistro(idRecepcionista);
+            let saltSenha = await hash.findOne({where:{idRecepcionista}});
             return saltSenha ? saltSenha.salt : null;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'SaltSenha', 'buscarSalt');
@@ -37,7 +38,9 @@ class hashServices extends Services{
 
     async verificarSenha(senha, senhaHashed, idRecepcionista){
         try{
+            console.log(idRecepcionista);
             let salt = await this.buscarSalt(idRecepcionista);
+            console.log(salt);
             if (!salt) throw new Error('Salt não encontrado');
             let hashed = await this.gerarHash(salt + senha);
             return hashed === senhaHashed;
