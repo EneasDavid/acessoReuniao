@@ -1,5 +1,5 @@
 const Controller=require('./controller.js');
-const ReservaServices=require('../services/ReservaServices.js');
+const ReservaServices=require('../services/reservaServices.js');
 const reservaServices=new ReservaServices();
 
 class ReservaController extends Controller{
@@ -44,6 +44,9 @@ class ReservaController extends Controller{
         }catch(erro){
             return res.status(500).json({error:erro.name, message:erro.message, model:'Reserva', method:'cria'});
         }
+    }
+    async concluirResrva(req, res){
+        //colocar campo: algo erro->direcionar stralk usndo this.entidadeService(PARA LISTANEGRA)
     }
 }
 

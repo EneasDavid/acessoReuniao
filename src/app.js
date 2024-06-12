@@ -1,22 +1,34 @@
-const express=require('express');
-const routes=require('./routes');
-const cors=require('cors');
-const app=express();
+const express = require('express');
+const routes = require('./routes');
+const cors = require('cors');
+const helmet = require('helmet'); // Pacote para adicionar headers de segurança
+const rateLimit = require('express-rate-limit'); // Pacote para limitar a taxa de solicitações
 
-app.use(cors()); // Usar o middleware CORS antes de qualquer outro middleware
+const app = express();
 
-app.use((request, response, next) => {
-    // Permite chamadas de qualquer origem, porém reduz a segurança
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+// Middleware de segurança
+app.use(cors()); // Middleware CORS para permitir solicitações de várias origens
+app.use(helmet()); // Middleware Helmet para adicionar headers de segurança
+
+// Limitador de taxa para proteção contra ataques de força bruta
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, 
+  max: 100, 
+});
+app.use(limiter);
+
+// Middleware para registrar todas as solicitações
+app.use((req, res, next) => {
+  console.log(`Nova solicitação: ${req.method} ${req.originalUrl}`);
+  next();
 });
 
+// Rota inicial
 app.get('/', (req, res) => {
-    res.status(200).send({ mensagem: 'Enéas é foda!' });
+  res.status(200).send({ mensagem: 'Enéas é foda!' });
 });
 
+// Rotas da aplicação
 routes(app);
 
 module.exports = app;

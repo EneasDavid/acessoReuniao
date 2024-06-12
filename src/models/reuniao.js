@@ -7,7 +7,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Reuniao.belongsTo(models.Reserva, {
         foreignKey: 'reservaId',
-        as: 'reserva'
+        as: 'reserva',
+        onDelete: 'CASCADE',
       });
     }
   }

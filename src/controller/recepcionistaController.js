@@ -1,11 +1,22 @@
 const Controller=require('./controller.js');
-const RecepcionistaServices=require('../services/RecepcionistaServices.js');
+const RecepcionistaServices=require('../services/recepcionistaServices.js');
 const recepcionistaServices=new RecepcionistaServices();
 
 class RecepcionistaController extends Controller{
     constructor(){
         super(recepcionistaServices);
     }
+
+    async cria(req, res){
+        const novoRegistro = req.body;
+        try{
+            const novoRegistroCriado = await recepcionistaServices.criarRecepcionista(novoRegistro);
+            return res.status(200).json(novoRegistroCriado);
+        }catch(erro){
+            return res.status(500).json({error:erro.name, message:erro.message, model:'Recepcionista', method:'cria'});
+        }
+    }
+
     async login(req,res){
         const {login,senha}=req.body;
         try{

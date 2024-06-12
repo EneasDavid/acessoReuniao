@@ -2,20 +2,25 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('reunioes', {
+    await queryInterface.createTable('saltSenhas', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      reservaId: {
+      idRecepcionista: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        type: Sequelize.INTEGER
+        references: {
+          model: 'recepcionistas',
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
       },
-      idParticipante: {
+      salt: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +33,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('reunioes');
+    await queryInterface.dropTable('saltSenhas');
   }
 };

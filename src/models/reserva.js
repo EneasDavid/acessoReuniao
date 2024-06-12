@@ -7,15 +7,15 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Reserva.belongsTo(models.Sala, {
         foreignKey: 'idSala',
-        as: 'sala'
+        as: 'salas'
       });
       Reserva.belongsTo(models.Usuario, {
         foreignKey: 'idUsuario',
-        as: 'usuario'
+        as: 'usuarios'
       });
-      Reserva.belongsTo(models.Usuario, {
+      Reserva.belongsTo(models.Recepcionista, {
         foreignKey: 'idRecepcionista',
-        as: 'recepcionista'
+        as: 'recepcionistas'
       });
     }
   }
