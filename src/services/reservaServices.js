@@ -3,6 +3,7 @@ const dataSource = require('../models/index.js');
 const z=require('zod');
 
 class ReservaServices extends Services{
+    
     constructor(){
         super('Reserva',z.object({
             idSala:z.number().int({message:"O campo de idSala necessita ser um numero inteiro"}).positive({message:"O campo de idSala necessita ser um numero inteiro positivo"}),
@@ -15,6 +16,7 @@ class ReservaServices extends Services{
             motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional(),
           }));
     }
+
     async reservaStatus(situacao){
         try{
             return await dataSource.Reserva.findAll({where:{statusReserva:situacao}});
@@ -73,7 +75,7 @@ class ReservaServices extends Services{
             novoRegistro.horaFimReserva = novaHoraString;
             
         
-            const createdReserva = await dataSource.Reserva.create(novoRegistro);
+            const createdReserva = await this.criaRegistro(novoRegistro);
             return createdReserva;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');
@@ -89,6 +91,48 @@ class ReservaServices extends Services{
             throw error;
         }
     }
+
+    async confirmarReserva(id_reserva){
+        const atualizacao={
+            statusReserva:'CONFIRMADO',
+            dataModificacaoStatus:new Date()
+        };
+        try{
+            const reserva =  await this.pegaUmRegistro(id_reserva);
+            if(reserva.statusReserva === 'PENDENTE') return await this.atualiza(atualizacao);
+            return {error: 'Reserva já confirmada'};
+        }catch(error){
+            await this.salvarErro(error.name, error.message, 'Reserva', 'confirmarEntrega');
+            throw error;
+        }
+    }
+
+    async concluirReserva(id_resreva){
+        const concluir={
+            statusReserva:'CONCLUIDO',
+            dataModificacaoStatus:new Date()
+        };
+        try{
+            const reserva=await this.pegaUmRegistro(id_resreva);
+            if(reserva.statusReserva==='CONFIRMADO') return await this.atualiza(concluir);
+        }catch{
+            await this.salvarErro(error.name, error.message, 'Reserva', 'concluirReserva');
+            throw error;
+        };
+    }
+    /*concluirResreva
+        ├── data de conclusao
+        ├── mudar estado da reserva com updateAt
+        ├── pergunta: Houve alguma infração?
+                ├── se sim, recebe os valores
+                ├── o que foi que fez (motivo)
+                └── Direciona para criarLista negra (idResponsavel, idReservaMotivo, motivo)
+        └──se não, finaliza updateAt
+
+        criarRegistro(dados){
+            codBloqueio=gerar(random(String min(10)))
+        }
+    */
 }
 
 module.exports=ReservaServices;
