@@ -35,7 +35,6 @@ describe('Teste das rotas de listaNegra', () => {
             .post('/listaNegra')
             .send(validData)
             .set('Authorization', `Bearer ${token}`);
-        console.log(response.body);
         expect(response.status).toBe(200);
     });
 

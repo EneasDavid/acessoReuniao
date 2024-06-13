@@ -13,7 +13,7 @@ class ReservaServices extends Services{
             dataReservada:z.string().date({message:"O campo dataReservada necessita do time yyyy-mm-dd"}),
             horaInicio:z.string().time({message:"O campo horaInicio necessita do time hh:mm:ss"}),
             horaFimReserva:z.string().time({message:"O campo horaFimReserva necessita do time hh:mm:ss"}),
-            statusReserva:z.string().length(1,{message:"o campo statusReserva necessita de apenas um caracter"}).toUpperCase(),
+            statusReserva:z.string().min(7,'O campo status necessita de no minimo 7 caracteres').max(10,'O campo status necessita de no maximo 10 caracteres').toUpperCase(),
             dataModificacaoStatus:z.string().date({message:"O campo dataModificacaoStatus necessita do time yyyy-mm-dd"}),
             motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional(),
           }));
@@ -104,17 +104,14 @@ class ReservaServices extends Services{
                 throw new Error(errorMessage);
             }
     
-            // Verificações adicionais conforme necessidade do seu sistema
             if (dadosAtualizados.statusReserva === 'CONFIRMADO' || dadosAtualizados.statusReserva === 'CANCELADO') {
                 const errorMessage = 'Não é possível confirmar ou cancelar uma reserva inexistente';
                 await this.salvarErro('InvalidOperation', errorMessage, 'Reserva', 'atualizar');
                 throw new Error(errorMessage);
             }
     
-            // Gerar horaFimReserva
             dadosAtualizados.horaFimReserva = await this.gerarHoraFim(dadosExistentes.horaInicio, 3);
     
-            // Atualiza o registro no banco de dados
             return await dataSource.Reserva.update(dadosAtualizados, { where: { id } });
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'atualizar');
@@ -139,7 +136,7 @@ class ReservaServices extends Services{
         };
         try{
             const reserva =  await this.pegaUmRegistro(id);
-            if(reserva.statusReserva === 'PENDENTE') return await dataSource.Reserva.update(atualizacao,{where:{id}});
+            if(reserva.statusReserva === 'PENDENTE') return await dataSource.Reserva.update(atualizacao, { where: { id } });
             return {error: 'Reserva já confirmada'};
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'confirmarEntrega');
@@ -163,7 +160,7 @@ class ReservaServices extends Services{
                     await listaNegraServices.criaRegistro(registroInfracao);
                 }
             }
-            return await dataSource.Reserva.update(concluir,{where:{id}});
+            return await dataSource.Reserva.update(concluir, { where: { id } });
         }catch{
             await this.salvarErro(error.name, error.message, 'Reserva', 'concluirReserva');
             throw error;

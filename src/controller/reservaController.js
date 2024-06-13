@@ -58,9 +58,9 @@ class ReservaController extends Controller{
 
     async concluirReserva(req, res){
         const id = req.params.id;
-        const { infracao, motivoInfracao } = req.body;
+        const dadosInfracao = req.body; 
         try {
-            const result = await reservaServices.concluirReserva(id, infracao, motivoInfracao);
+            const result = await reservaServices.concluirReserva(id, dadosInfracao);
             res.status(200).json({ message: 'Reserva concluída com sucesso', data: result });
         } catch (error) {
             res.status(500).json({ message: 'Erro ao concluir reserva', error: error.message });

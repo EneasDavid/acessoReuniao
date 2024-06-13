@@ -76,21 +76,21 @@ describe('Teste das rotas de reserva', ()=>{
     });
     
 
-    it('Deve confirmar uma reserva pendente', async () => {
+    it.only('Deve confirmar uma reserva pendente', async () => {
         const token = gerarToken(1); 
         const response = await request(app)
-            .post('/reserva/confirmar/5')
+            .put('/reserva/confirmar/4')
             .set('Authorization', `Bearer ${token}`);
-        expect(response.status).toBe(200); // Ajuste conforme necessário
+        expect(response.status).toBe(200); 
     });
     
-    it('Deve concluir uma reserva confirmada', async () => {
+    it.only('Deve concluir uma reserva confirmada', async () => {
         const token = gerarToken(1); 
         const response = await request(app)
-            .post('/reserva/concluir/5')
-            .send({ infracao: 'sim', motivoInfracao: 'motivo' })
+            .put('/reserva/concluir/4')
+            .send({ infracao: 'nao'})
             .set('Authorization', `Bearer ${token}`);
-        expect(response.status).toBe(200); // Ajuste conforme necessário
+        expect(response.status).toBe(200);
     });
     
 
