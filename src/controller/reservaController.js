@@ -45,6 +45,16 @@ class ReservaController extends Controller{
             return res.status(500).json({error:erro.name, message:erro.message, model:'Reserva', method:'cria'});
         }
     }
+    async atualizar(req, res){
+        try{
+            const id = req.params.id;
+            const dadosAtualizados=req.body;
+            const registroAtualizado=await reservaServices.atualizar(dadosAtualizados, id);
+            return res.status(200).json(registroAtualizado);
+        }catch(erro){
+            return res.status(500).json({error:erro.name, message:erro.message, model:'Reserva', method:'atualizar'});
+        }
+    }
 
     async concluirReserva(req, res){
         const id = req.params.id;

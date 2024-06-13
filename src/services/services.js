@@ -61,28 +61,30 @@ class Services {
 
     async atualizaRegistro(dadosAtualizados, id) {
         try {
+            // Busca os dados existentes pelo ID
             const dadosExistentes = await this.pegaUmRegistro(id);
             if (!dadosExistentes) {
                 const errorMessage = 'Registro não encontrado';
-                await this.salvarErro('NotFound', errorMessage);
+                await this.salvarErro('Not Found', errorMessage, this.model, 'atualizaRegistro');
                 throw new Error(errorMessage);
             }
-
+    
             const dadosParaAtualizar = {
                 ...dadosExistentes.toJSON(),
-                ...dadosAtualizados,
-                updatedAt: new Date(),
+                ...dadosAtualizados, 
+                updatedAt: new Date(), 
             };
-            
             await this.validarDados(dadosParaAtualizar);
-
-            return await dataSource[this.model].update(dadosParaAtualizar, { where: { id } });
+    
+            const resultadoAtualizacao = await dataSource[this.model].update(dadosParaAtualizar, { where: { id } });
+    
+            return resultadoAtualizacao;
         } catch (error) {
             await this.salvarErro(error.name, error.message, this.model, 'atualizaRegistro');
             throw error;
         }
     }
-
+    
     async deletaRegistro(id) {
         try {
             return await dataSource[this.model].destroy({ where: { id } });

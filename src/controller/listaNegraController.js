@@ -7,10 +7,10 @@ class ListaNegraController extends Controller{
         super(listaNegraServices);
     }
 
-    async cria(req, res){
+    async criar(req, res){
         const novoRegistro = req.body;
         try{
-            const novoRegistroCriado = await listaNegraServices.criaRegistro(novoRegistro);
+            const novoRegistroCriado = await listaNegraServices.criar(novoRegistro);
             return res.status(200).json(novoRegistroCriado);
         }catch(erro){
             return res.status(500).json({error:erro.name, message:erro.message, model:'Lista Negra', method:'cria'});

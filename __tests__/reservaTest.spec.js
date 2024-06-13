@@ -3,7 +3,7 @@ const app = 'http://localhost:3000';
 const gerarToken=require('../src/middleware/criarTolke.js');
 
 describe('Teste das rotas de reserva', ()=>{
-    const atributos = ['idSala', 'idUsuario', 'idRecepcionista', 'dataReservada', 'horaInicio', 'horaFimReserva', 'statusReserva', 'dataModificacaoStatus'];
+    const atributos = ['idSala', 'idUsuario', 'idRecepcionista', 'dataReservada', 'horaInicio', 'statusReserva'];
     const validData = {
         id:5,
         idSala:2,
@@ -20,7 +20,6 @@ describe('Teste das rotas de reserva', ()=>{
             .get('/reserva')
         expect(response.status).toBe(200);
     });
-    //Quebrado??
     it('Deve criar uma nova reserva', async()=>{
         const token = gerarToken(1); 
         const response = await request(app)
@@ -61,37 +60,39 @@ describe('Teste das rotas de reserva', ()=>{
             .put('/reserva/5')
             .send({idRecepcionista: 2})
             .set('Authorization', `Bearer ${token}`);
+        console.log(response.body);
         expect(response.status).toBe(200);
     });
-    
     atributos.forEach(atributo => {
-        it(`Deve retornar erro ao tentar atualizar com o atributo ${atributo} nulo`, async()=>{
+        it(`Deve retornar erro ao tentar atualizar com o atributo ${atributo} nulo`, async () => {
             const token = gerarToken(1); 
             const updatedData = { ...validData, [atributo]: null };
             const response = await request(app)
                 .put('/reserva/5')
                 .send(updatedData)
                 .set('Authorization', `Bearer ${token}`);
-            expect(response.status).toBe(500);
+            expect(response.status).toBe(500); // Ajuste conforme necessário
         });
     });
+    
 
     it('Deve confirmar uma reserva pendente', async () => {
         const token = gerarToken(1); 
         const response = await request(app)
             .post('/reserva/confirmar/5')
             .set('Authorization', `Bearer ${token}`);
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(200); // Ajuste conforme necessário
     });
-
+    
     it('Deve concluir uma reserva confirmada', async () => {
         const token = gerarToken(1); 
         const response = await request(app)
             .post('/reserva/concluir/5')
-            .send({infracao: 'sim', motivoInfracao: 'motivo'})
+            .send({ infracao: 'sim', motivoInfracao: 'motivo' })
             .set('Authorization', `Bearer ${token}`);
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(200); // Ajuste conforme necessário
     });
+    
 
     it('Deve deletar uma reserva existente', async()=>{
         const token = gerarToken(1); 

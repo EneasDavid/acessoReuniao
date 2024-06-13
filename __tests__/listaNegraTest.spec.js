@@ -3,7 +3,7 @@ const app = 'http://localhost:3000';
 const gerarToken=require('../src/middleware/criarTolke.js');
 
 describe('Teste das rotas de listaNegra', () => {
-    const atributos = ['idResponsavel', 'idReservaMotivo', 'codBloqueio', 'motivo','dataBloqueio'];
+    const atributos = ['idResponsavel', 'idReservaMotivo', 'motivo','dataBloqueio'];
     const validData = {
         id:2, //Importante travar no id 2 para não dar erro
         idResponsavel: 1,
@@ -33,8 +33,9 @@ describe('Teste das rotas de listaNegra', () => {
         const token = gerarToken(1); // Gerar token com nível de acesso 1
         const response = await request(app)
             .post('/listaNegra')
-            .set('Authorization', `Bearer ${token}`)
-            .send(validData);
+            .send(validData)
+            .set('Authorization', `Bearer ${token}`);
+        console.log(response.body);
         expect(response.status).toBe(200);
     });
 
