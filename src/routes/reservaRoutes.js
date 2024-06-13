@@ -13,6 +13,7 @@ router.get('/reserva/:idSala/:dataReservada/:horaReservada',(req, res)=>reservaC
 router.post('/reserva', verificarToken(2), (req, res)=>reservaController.cria(req, res));
 router.post('/reserva/email', verificarToken(2), (req, res)=>reservaController.enviaEmail(req, res));
 router.put('/reserva/:id', verificarToken(2), (req, res)=>reservaController.atualiza(req, res));
+router.put('/reserva/concluir', verificarToken(2), (req, res)=>reservaController.concluirReserva(req, res));
 router.delete('/reserva/:id', verificarToken(1), (req, res)=>reservaController.deleta(req,res));
 
 

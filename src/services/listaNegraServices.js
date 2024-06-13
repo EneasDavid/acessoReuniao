@@ -12,6 +12,23 @@ class ListaNegraServices extends Services{
             dataBloqueio:z.string().date({message:"O campo dataBloqueio necessita do time yyyy-mm-dd"}),
         }));
     }
+
+    async gerarCodigoBloqueio(){
+        return Math.random().toString(36).substr(2, 10);
+    }
+
+    async criaRegistro(novoRegistro){
+        try{
+            const dataBloqueio = new Date();
+            novoRegistro.dataBloqueio = dataBloqueio.toISOString().split('T')[0];
+            codBloqueio = await this.gerarCodigoBloqueio();
+            novoRegistro.codBloqueio = codBloqueio;
+            return await this.criaRegistro(novoRegistro);
+        }catch(error){
+            await this.salvarErro(error.name, error.message, 'ListaNegra', 'criaRegistro');
+            throw error;
+        }
+    }
 }
 
 module.exports=ListaNegraServices;

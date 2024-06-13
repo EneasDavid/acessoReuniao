@@ -1,4 +1,6 @@
 const Services=require('./services.js');
+const ListaNegraServices=require('./listaNegraServices.js');
+const listaNegraServices = new ListaNegraServices();
 const dataSource = require('../models/index.js');
 const z=require('zod');
 
@@ -107,32 +109,26 @@ class ReservaServices extends Services{
         }
     }
 
-    async concluirReserva(id_resreva){
+    async concluirReserva(id_resreva, infracao=false, motivoInfracao = ''){
         const concluir={
             statusReserva:'CONCLUIDO',
             dataModificacaoStatus:new Date()
         };
         try{
             const reserva=await this.pegaUmRegistro(id_resreva);
-            if(reserva.statusReserva==='CONFIRMADO') return await this.atualiza(concluir);
+            if(reserva.statusReserva==='CONFIRMADO'){
+                if(infracao){
+                    const idResponsavel = reserva.idUsuario;
+                    const motivo = motivoInfracao;
+                    const registroInfracao = { idResponsavel, id_resreva, motivo};
+                    await listaNegraServices.criaRegistro(registroInfracao);
+                }
+            } return await this.atualiza(concluir);
         }catch{
             await this.salvarErro(error.name, error.message, 'Reserva', 'concluirReserva');
             throw error;
         };
     }
-    /*concluirResreva
-        ├── data de conclusao
-        ├── mudar estado da reserva com updateAt
-        ├── pergunta: Houve alguma infração?
-                ├── se sim, recebe os valores
-                ├── o que foi que fez (motivo)
-                └── Direciona para criarLista negra (idResponsavel, idReservaMotivo, motivo)
-        └──se não, finaliza updateAt
-
-        criarRegistro(dados){
-            codBloqueio=gerar(random(String min(10)))
-        }
-    */
 }
 
 module.exports=ReservaServices;

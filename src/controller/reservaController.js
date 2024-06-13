@@ -45,9 +45,17 @@ class ReservaController extends Controller{
             return res.status(500).json({error:erro.name, message:erro.message, model:'Reserva', method:'cria'});
         }
     }
+
     async concluirResrva(req, res){
-        //colocar campo: algo erro->direcionar stralk usndo this.entidadeService(PARA LISTANEGRA)
+        const { id_reserva, infracao, motivoInfracao } = req.body;
+        try {
+            const result = await reservaServices.concluirReserva(id_reserva, infracao, motivoInfracao);
+            res.status(200).json({ message: 'Reserva concluída com sucesso', data: result });
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao concluir reserva', error: error.message });
+        }
     }
+
 }
 
 module.exports=ReservaController;
