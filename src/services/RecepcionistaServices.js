@@ -1,7 +1,7 @@
 const Services=require("./services.js");
 const hashServices=require("./saltSenha.js")
 // const modelGeral=require("../models");
-const Recepcionista=require("../models").Recepcionista;
+const dataSource = require('../models/index.js');
 const z=require('zod');
 const jwt=require('jsonwebtoken');
 const palavraPasse='SectiAlagoas@2024%';
@@ -35,7 +35,7 @@ class recepcionistaServices extends Services{
 
     async login(login, senha) {
         try {
-            let usuario = await Recepcionista.findOne({ where: { login } });
+            let usuario = await dataSource.Recepcionista.findOne({ where: { login } });
             if (!usuario) throw new Error('Login inválido ou inexistente');
     
             let senhaValida = await this.hashService.verificarSenha(senha, usuario.senha, usuario.id);

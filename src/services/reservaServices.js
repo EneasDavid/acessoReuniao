@@ -75,9 +75,8 @@ class ReservaServices extends Services{
             const novaHoraString = `${novaHora.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
             
             novoRegistro.horaFimReserva = novaHoraString;
-            
-        
-            const createdReserva = await this.criaRegistro(novoRegistro);
+            //This.criar tava chamadno recursivamente o criaRegistro    
+            const createdReserva = await dataSource.Reserva.create(novoRegistro);
             return createdReserva;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');

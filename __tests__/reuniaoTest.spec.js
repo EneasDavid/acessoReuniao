@@ -1,6 +1,7 @@
-const request=require('supertest');
-const app='http://localhost:3000';
+const request = require('supertest');
+const app = 'http://localhost:3000';
 const gerarToken=require('../src/middleware/criarTolke.js');
+
 
 describe('Teste das rotas de reuniao', ()=>{
     const atributos = ['reservaId', 'idParticipante'];

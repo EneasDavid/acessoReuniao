@@ -1,5 +1,5 @@
-const request=require('supertest');
-const app='http://localhost:3000';
+const request = require('supertest');
+const app = 'http://localhost:3000';
 const gerarToken=require('../src/middleware/criarTolke.js');
 
 describe('Teste das rotas de reserva', ()=>{
@@ -20,7 +20,7 @@ describe('Teste das rotas de reserva', ()=>{
             .get('/reserva')
         expect(response.status).toBe(200);
     });
-
+    //Quebrado??
     it('Deve criar uma nova reserva', async()=>{
         const token = gerarToken(1); 
         const response = await request(app)
@@ -74,6 +74,23 @@ describe('Teste das rotas de reserva', ()=>{
                 .set('Authorization', `Bearer ${token}`);
             expect(response.status).toBe(500);
         });
+    });
+
+    it('Deve confirmar uma reserva pendente', async () => {
+        const token = gerarToken(1); 
+        const response = await request(app)
+            .post('/reserva/confirmar/5')
+            .set('Authorization', `Bearer ${token}`);
+        expect(response.status).toBe(200);
+    });
+
+    it('Deve concluir uma reserva confirmada', async () => {
+        const token = gerarToken(1); 
+        const response = await request(app)
+            .post('/reserva/concluir/5')
+            .send({infracao: 'sim', motivoInfracao: 'motivo'})
+            .set('Authorization', `Bearer ${token}`);
+        expect(response.status).toBe(200);
     });
 
     it('Deve deletar uma reserva existente', async()=>{
