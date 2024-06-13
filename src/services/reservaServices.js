@@ -134,7 +134,6 @@ class ReservaServices extends Services{
         };
         try{
             const reserva = await this.pegaUmRegistro(id);
-            console.log(reserva);
             if(reserva.statusReserva === 'pendente') return await dataSource.Reserva.update(atualizacao, { where: { id } });
             await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'confirmarEntrega');
             throw new Error({error: 'Reserva já confirmada'});
