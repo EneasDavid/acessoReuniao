@@ -11,7 +11,7 @@ describe('Teste das rotas de reserva', ()=>{
         idRecepcionista:1,
         dataReservada: new Date(),
         horaInicio: new Date(),
-        statusReserva:'confirmado',
+        statusReserva:'PENDENTE',
         dataModificacaoStatus: new Date(),
     };
 
@@ -60,7 +60,6 @@ describe('Teste das rotas de reserva', ()=>{
             .put('/reserva/5')
             .send({idRecepcionista: 2})
             .set('Authorization', `Bearer ${token}`);
-        console.log(response.body);
         expect(response.status).toBe(200);
     });
     atributos.forEach(atributo => {
@@ -76,19 +75,19 @@ describe('Teste das rotas de reserva', ()=>{
     });
     
 
-    it.only('Deve confirmar uma reserva pendente', async () => {
+    it('Deve confirmar uma reserva pendente', async () => {
         const token = gerarToken(1); 
         const response = await request(app)
-            .put('/reserva/confirmar/4')
+            .put('/reserva/confirmar/5')
             .set('Authorization', `Bearer ${token}`);
         expect(response.status).toBe(200); 
     });
     
-    it.only('Deve concluir uma reserva confirmada', async () => {
+    it('Deve concluir uma reserva confirmada', async () => {
         const token = gerarToken(1); 
         const response = await request(app)
-            .put('/reserva/concluir/4')
-            .send({ infracao: 'nao'})
+            .put('/reserva/concluir/5')
+            .send({ infracao: false})
             .set('Authorization', `Bearer ${token}`);
         expect(response.status).toBe(200);
     });

@@ -1,6 +1,5 @@
 const Services=require('./services.js');
-const ListaNegraServices=require('./listaNegraServices.js');
-const listaNegraServices = new ListaNegraServices();
+const listaNegraServices=require('./listaNegraServices.js');
 const dataSource = require('../models/index.js');
 const z=require('zod');
 
@@ -13,7 +12,7 @@ class ReservaServices extends Services{
             dataReservada:z.string().date({message:"O campo dataReservada necessita do time yyyy-mm-dd"}),
             horaInicio:z.string().time({message:"O campo horaInicio necessita do time hh:mm:ss"}),
             horaFimReserva:z.string().time({message:"O campo horaFimReserva necessita do time hh:mm:ss"}),
-            statusReserva:z.string().min(7,'O campo status necessita de no minimo 7 caracteres').max(10,'O campo status necessita de no maximo 10 caracteres').toUpperCase(),
+            statusReserva:z.string().min(7,'O campo status necessita de no minimo 7 caracteres').max(10,'O campo status necessita de no maximo 10 caracteres'),
             dataModificacaoStatus:z.string().date({message:"O campo dataModificacaoStatus necessita do time yyyy-mm-dd"}),
             motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional(),
           }));
@@ -86,7 +85,6 @@ class ReservaServices extends Services{
             novoRegistro.statusReserva = 'pendente';
             const novaHoraString = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
             novoRegistro.horaFimReserva = novaHoraString;
-            console.log(novaHoraString);
             const createdReserva = await dataSource.Reserva.create(novoRegistro);
             return createdReserva;
         }catch(error){
@@ -131,13 +129,15 @@ class ReservaServices extends Services{
 
     async confirmarReserva(id){
         const atualizacao={
-            statusReserva:'CONFIRMADO',
-            dataModificacaoStatus:new Date()
+            statusReserva:'confirmado',
+            dataModificacaoStatus: new Date().toISOString()
         };
         try{
-            const reserva =  await this.pegaUmRegistro(id);
-            if(reserva.statusReserva === 'PENDENTE') return await dataSource.Reserva.update(atualizacao, { where: { id } });
-            return {error: 'Reserva já confirmada'};
+            const reserva = await this.pegaUmRegistro(id);
+            console.log(reserva);
+            if(reserva.statusReserva === 'pendente') return await dataSource.Reserva.update(atualizacao, { where: { id } });
+            await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'confirmarEntrega');
+            throw new Error({error: 'Reserva já confirmada'});
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'confirmarEntrega');
             throw error;
@@ -146,21 +146,22 @@ class ReservaServices extends Services{
 
     async concluirReserva(id, concluirReserva){
         const concluir={
-            statusReserva:'CONCLUIDO',
-            dataModificacaoStatus:new Date()
+            statusReserva:'concluido',
+            dataModificacaoStatus: new Date().toISOString()
         };
-
         try{
             const reserva=await this.pegaUmRegistro(id);
-            if(reserva.statusReserva==='CONFIRMADO'){
+            if(reserva.statusReserva==='confirmado'){
                 if(concluirReserva.infracao){
                     const idResponsavel = reserva.idUsuario;
                     const motivo = concluirReserva.motivoInfracao;
                     const registroInfracao = { idResponsavel, id, motivo};
                     await listaNegraServices.criaRegistro(registroInfracao);
                 }
+                return await dataSource.Reserva.update(concluir, { where: { id } });
             }
-            return await dataSource.Reserva.update(concluir, { where: { id } });
+            await this.salvarErro('status incorreto', 'Reserva não está CONFIRMADO', 'Reserva', 'concluirReserva');
+            throw new Error({error: 'Reserva já Concluida ou inda pendente'});
         }catch{
             await this.salvarErro(error.name, error.message, 'Reserva', 'concluirReserva');
             throw error;
