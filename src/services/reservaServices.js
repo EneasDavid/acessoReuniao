@@ -14,26 +14,40 @@ class ReservaServices extends Services{
             horaFimReserva:z.string().time({message:"O campo horaFimReserva necessita do time hh:mm:ss"}),
             statusReserva:z.string().min(7,'O campo status necessita de no minimo 7 caracteres').max(10,'O campo status necessita de no maximo 10 caracteres'),
             dataModificacaoStatus:z.string().date({message:"O campo dataModificacaoStatus necessita do time yyyy-mm-dd"}),
-            motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional(),
+            motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional().nullish(),
           }));
     }
+    
     async gerarHoraFim(horaInicio, duracao) {
         try {
-            if (!horaInicio) {
-                throw new Error('Hora de início inválida');
-            }
-            
             const horaInicioDate = new Date(horaInicio);
             horaInicioDate.setHours(horaInicioDate.getHours() + parseInt(duracao));
-            const novaHoraString = `${horaInicioDate.getHours().toString().padStart(2, '0')}:${horaInicioDate.getMinutes().toString().padStart(2, '0')}`;
+            const novaHoraString = await this.formatarHora(horaInicioDate);
             return novaHoraString;
         } catch (error) {
-            await this.salvarErro(error.name, error.message, 'ListaNegra', 'gerarHoraFim');
+            await this.salvarErro(error.name, error.message, 'reserva', 'gerarHoraFim');
             throw error;
         }
     }
-    
-    
+
+    async formatarHora(hora) {
+        try {
+            return `${hora.getHours().toString().padStart(2, '0')}:${hora.getMinutes().toString().padStart(2, '0')}:${hora.getSeconds().toString().padStart(2, '0')}`;
+        } catch (error) {
+            this.salvarErro(error.name, error.message, 'reserva', 'formatarHora');
+            throw error;
+        }
+    }
+
+    async formatarData(data) {
+        try {
+            return `${data.getFullYear().toString().padStart(4, '0')}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getDate().toString().padStart(2, '0')}`;
+        } catch (error) {
+            this.salvarErro(error.name, error.message, 'reserva', 'formatarData');
+            throw error;
+        }
+    }
+
     async reservaStatus(situacao){
         try{
             return await dataSource.Reserva.findAll({where:{statusReserva:situacao}});
@@ -79,15 +93,24 @@ class ReservaServices extends Services{
     }
     
     async criaRegistro(novoRegistro) {
-        try{
+        try {
             const response = await this.verificaDisponibilidade(novoRegistro.idSala, novoRegistro.dataReservada, novoRegistro.horaInicio);
             if (response) return { error: 'Sala já reservada' };
+    
             novoRegistro.statusReserva = 'pendente';
-            const novaHoraString = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
-            novoRegistro.horaFimReserva = novaHoraString;
-            const createdReserva = await dataSource.Reserva.create(novoRegistro);
-            return createdReserva;
-        }catch(error){
+            const novaHoraFim = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
+            const novaHoraInicio = await this.formatarHora(new Date(novoRegistro.horaInicio));
+            const dataReservadaFormata= await this.formatarData(new Date(novoRegistro.dataReservada));
+            const dataModificaStatusFormata=await this.formatarData(new Date(novoRegistro.dataModificacaoStatus));
+            novoRegistro.horaInicio = novaHoraInicio;
+            novoRegistro.horaFimReserva = novaHoraFim;
+            novoRegistro.dataReservada = dataReservadaFormata; 
+            novoRegistro.dataModificacaoStatus = dataModificaStatusFormata; 
+    
+            await this.validarDados(novoRegistro);
+            
+            return await dataSource.Reserva.create(novoRegistro);;
+        } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');
             throw error;
         }
@@ -101,16 +124,26 @@ class ReservaServices extends Services{
                 await this.salvarErro('NotFound', errorMessage, 'Reserva', 'atualizar');
                 throw new Error(errorMessage);
             }
-    
-            if (dadosAtualizados.statusReserva === 'CONFIRMADO' || dadosAtualizados.statusReserva === 'CANCELADO') {
+            const dadosParaAtualizar = {
+                ...dadosExistentes.toJSON(),
+                ...dadosAtualizados, 
+                updatedAt: new Date(), 
+            };
+
+            if (dadosParaAtualizar.statusReserva === 'CONFIRMADO' || dadosParaAtualizar.statusReserva === 'CANCELADO') {
                 const errorMessage = 'Não é possível confirmar ou cancelar uma reserva inexistente';
                 await this.salvarErro('InvalidOperation', errorMessage, 'Reserva', 'atualizar');
                 throw new Error(errorMessage);
             }
-    
-            dadosAtualizados.horaFimReserva = await this.gerarHoraFim(dadosExistentes.horaInicio, 3);
-    
-            return await dataSource.Reserva.update(dadosAtualizados, { where: { id } });
+            if(dadosAtualizados.horaInicio){
+                const novaHoraInicio = await this.formatarHora(new Date(dadosParaAtualizar.horaInicio));
+                dadosParaAtualizar.horaInicio = novaHoraInicio;
+                const novaHoraFim = await this.gerarHoraFim(dadosParaAtualizar.horaInicio, 3);
+                dadosParaAtualizar.horaFimReserva = novaHoraFim;
+            }
+
+            await this.validarDados(dadosParaAtualizar);
+            return await dataSource.Reserva.update(dadosParaAtualizar, { where: { id } });
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'atualizar');
             throw error;
@@ -130,11 +163,11 @@ class ReservaServices extends Services{
     async confirmarReserva(id){
         const atualizacao={
             statusReserva:'confirmado',
-            dataModificacaoStatus: new Date().toISOString()
+            dataModificacaoStatus: await this.formatarData(new Date())
         };
         try{
             const reserva = await this.pegaUmRegistro(id);
-            if(reserva.statusReserva === 'pendente') return await dataSource.Reserva.update(atualizacao, { where: { id } });
+            if(reserva.statusReserva === 'pendente') return await dataSource.Reserva.update(atualizacao, { where: { id } }); 
             await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'confirmarEntrega');
             throw new Error({error: 'Reserva já confirmada'});
         }catch(error){
@@ -146,7 +179,7 @@ class ReservaServices extends Services{
     async concluirReserva(id, concluirReserva){
         const concluir={
             statusReserva:'concluido',
-            dataModificacaoStatus: new Date().toISOString()
+            dataModificacaoStatus: await this.formatarData(new Date())
         };
         try{
             const reserva=await this.pegaUmRegistro(id);
