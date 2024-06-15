@@ -98,18 +98,21 @@ class ReservaServices extends Services{
             if (response) return { error: 'Sala já reservada' };
     
             novoRegistro.statusReserva = 'pendente';
-            const novaHoraFim = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
-            const novaHoraInicio = await this.formatarHora(new Date(novoRegistro.horaInicio));
-            const dataReservadaFormata= await this.formatarData(new Date(novoRegistro.dataReservada));
-            const dataModificaStatusFormata=await this.formatarData(new Date(novoRegistro.dataModificacaoStatus));
-            novoRegistro.horaInicio = novaHoraInicio;
-            novoRegistro.horaFimReserva = novaHoraFim;
+
+            const [novoHorarioInicio, novaHorarioFim, dataReservadaFormata, dataModificaStatusFormata] = await Promise.all([
+                     this.formatarHora(new Date(novoRegistro.horaInicio)),
+                     this.gerarHoraFim(novoRegistro.horaInicio, 3),
+                     this.formatarData(new Date(novoRegistro.dataReservada)),
+                     this.formatarData(new Date(novoRegistro.dataModificacaoStatus)),
+            ]);
+            novoRegistro.horaInicio = novoHorarioInicio;
+            novoRegistro.horaFimReserva = novaHorarioFim;
             novoRegistro.dataReservada = dataReservadaFormata; 
             novoRegistro.dataModificacaoStatus = dataModificaStatusFormata; 
     
             await this.validarDados(novoRegistro);
             
-            return await dataSource.Reserva.create(novoRegistro);;
+            return await dataSource.Reserva.create(novoRegistro);
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');
             throw error;
@@ -136,10 +139,12 @@ class ReservaServices extends Services{
                 throw new Error(errorMessage);
             }
             if(dadosAtualizados.horaInicio){
-                const novaHoraInicio = await this.formatarHora(new Date(dadosParaAtualizar.horaInicio));
-                dadosParaAtualizar.horaInicio = novaHoraInicio;
-                const novaHoraFim = await this.gerarHoraFim(dadosParaAtualizar.horaInicio, 3);
-                dadosParaAtualizar.horaFimReserva = novaHoraFim;
+                const [novoHorarioInicio, novaHorarioFim] = await Promise.all([
+                     this.formatarHora(new Date(dadosParaAtualizar.horaInicio)),
+                     this.gerarHoraFim(dadosParaAtualizar.horaInicio, 3),
+                ]);                
+                dadosParaAtualizar.horaInicio = novoHorarioInicio;
+                dadosParaAtualizar.horaFimReserva = novaHorarioFim;
             }
 
             await this.validarDados(dadosParaAtualizar);

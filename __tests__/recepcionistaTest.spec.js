@@ -23,7 +23,7 @@ describe('Teste dos metodos atrelados a recepcionista', ()=>{
             nivelAcesso: 1,
         },{
             login: "chefion",
-            senha: "culpado de amor",
+            senha: "e aí bê",
             nome:"Ulpio",
             sobrenome:"Neto",
             ativo: true,
