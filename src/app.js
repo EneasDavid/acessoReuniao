@@ -9,6 +9,11 @@ const app = express();
 app.use(cors()); // Middleware CORS para permitir solicitações de várias origens
 app.use(helmet()); // Middleware Helmet para adicionar headers de segurança
 
+// Middleware para printar as requisições
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Rota inicial
 app.get('/', (req, res) => {
