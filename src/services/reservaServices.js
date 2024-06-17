@@ -9,11 +9,11 @@ class ReservaServices extends Services{
         super('Reserva',z.object({
             idSala:z.number().int({message:"O campo de idSala necessita ser um numero inteiro"}).positive({message:"O campo de idSala necessita ser um numero inteiro positivo"}),
             idUsuario:z.number().int({message:"O campo de idUsuario necessita ser um numero inteiro"}).positive({message:"O campo de idUsuario necessita ser um numero inteiro positivo"}),
-            dataReservada:z.string().date({message:"O campo dataReservada necessita do time yyyy-mm-dd"}),
-            horaInicio:z.string().time({message:"O campo horaInicio necessita do time hh:mm:ss"}),
-            horaFimReserva:z.string().time({message:"O campo horaFimReserva necessita do time hh:mm:ss"}),
+            dataReservada:z.string({message:"O campo dataReservada necessita do time yyyy-mm-dd"}),
+            horaInicio:z.string({message:"O campo horaInicio necessita do time hh:mm:ss"}),
+            horaFimReserva:z.string({message:"O campo horaFimReserva necessita do time hh:mm:ss"}),
+            dataModificacaoStatus:z.string({message:"O campo dataModificacaoStatus necessita do time yyyy-mm-dd"}),
             statusReserva:z.string().min(7,'O campo status necessita de no minimo 7 caracteres').max(10,'O campo status necessita de no maximo 10 caracteres'),
-            dataModificacaoStatus:z.string().date({message:"O campo dataModificacaoStatus necessita do time yyyy-mm-dd"}),
             motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional().nullish(),
           }));
     }
@@ -32,7 +32,7 @@ class ReservaServices extends Services{
 
     async formatarHora(hora) {
         try {
-            return `${hora.getHours().toString().padStart(2, '0')}:${hora.getMinutes().toString().padStart(2, '0')}:${hora.getSeconds().toString().padStart(2, '0')}`;
+            return `${hora.getHours().toString().padStart(2, '0')}:${hora.getMinutes().toString().padStart(2, '0')}`;
         } catch (error) {
             this.salvarErro(error.name, error.message, 'reserva', 'formatarHora');
             throw error;
@@ -41,7 +41,7 @@ class ReservaServices extends Services{
 
     async formatarData(data) {
         try {
-            return `${data.getFullYear().toString().padStart(4, '0')}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getDate().toString().padStart(2, '0')}`;
+            return `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}/${data.getFullYear().toString().padStart(4, '0')}`;
         } catch (error) {
             this.salvarErro(error.name, error.message, 'reserva', 'formatarData');
             throw error;
@@ -96,7 +96,7 @@ class ReservaServices extends Services{
             novoRegistro.horaFimReserva = novaHorarioFim;
             novoRegistro.dataReservada = dataReservadaFormata; 
             novoRegistro.dataModificacaoStatus = dataModificaStatusFormata; 
-    
+            console.log(novoRegistro);
             await this.validarDados(novoRegistro);
             
             return await dataSource.Reserva.create(novoRegistro);

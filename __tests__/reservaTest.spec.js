@@ -9,7 +9,7 @@ describe('Teste das rotas de reserva', ()=>{
         idSala:2,
         idUsuario:1,
         idRecepcionista:1,
-        dataReservada: new Date(),
+        dataReservada: amanha,
         horaInicio: new Date(),
         statusReserva:'PENDENTE',
         dataModificacaoStatus: new Date(),

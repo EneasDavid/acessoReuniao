@@ -3,57 +3,74 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('reservas', [
-      {
-        idSala: 1,
-        idUsuario: 1,
-        idRecepcionista: 1,
-        dataReservada: new Date(),
-        horaInicio: new Date(), //pegar apenas horas e minutos
-        horaFimReserva: new Date(),
-        statusReserva: 'PENDENTE',
-        dataModificacaoStatus:null,
-        motivoReserva: 'estudo coletivo',      
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },{
-        idSala: 2,
-        idUsuario: 2,
-        idRecepcionista: 1,
-        dataReservada: new Date(),
-        horaInicio: new Date(), //pegar apenas horas e minutos
-        horaFimReserva: new Date(),
-        statusReserva: 'PENDENTE',
-        dataModificacaoStatus:null,
-        motivoReserva: 'estudo coletivo',      
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },{
-        idSala: 3,
-        idUsuario: 3,
-        idRecepcionista: 1,
-        dataReservada: new Date(),
-        horaInicio: new Date(), //pegar apenas horas e minutos
-        horaFimReserva: new Date(),
-        statusReserva: 'PENDENTE',
-        dataModificacaoStatus:null,
-        motivoReserva: 'estudo coletivo',      
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },{
-        idSala: 4,
-        idUsuario: 1,
-        idRecepcionista: 2,
-        dataReservada: new Date(),
-        horaInicio: new Date(), //pegar apenas horas e minutos
-        horaFimReserva: new Date(),
-        statusReserva: 'PENDENTE',
-        dataModificacaoStatus:null,      
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-
-    ], {});
+    const ReservasServices=require("../services/reservaServices.js")
+    const reservasServices = new ReservasServices();
+    const [dataReservada, horaInicio]= await Promise.all([
+      reservasServices.formatarData(new Date()), 
+      reservasServices.formatarHora(new Date())]);
+    const reservas=[{
+      idSala: 1,
+      idUsuario: 1,
+      idRecepcionista: 1,
+      dataReservada: dataReservada,
+      horaInicio: horaInicio,
+      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      statusReserva: 'PENDENTE',
+      dataModificacaoStatus:null,
+      motivoReserva: 'estudo coletivo',      
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },{
+      idSala: 2,
+      idUsuario: 2,
+      idRecepcionista: 1,
+      dataReservada: dataReservada,
+      horaInicio: horaInicio,
+      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      statusReserva: 'PENDENTE',
+      dataModificacaoStatus:null,
+      motivoReserva: 'estudo coletivo',      
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },{
+      idSala: 3,
+      idUsuario: 3,
+      idRecepcionista: 1,
+      dataReservada: dataReservada,
+      horaInicio: horaInicio,
+      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      statusReserva: 'PENDENTE',
+      dataModificacaoStatus:null,
+      motivoReserva: 'estudo coletivo',      
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },{
+      idSala: 4,
+      idUsuario: 1,
+      idRecepcionista: 2,
+      dataReservada: dataReservada,
+      horaInicio: horaInicio,
+      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      statusReserva: 'PENDENTE',
+      dataModificacaoStatus:null,      
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }];
+    await queryInterface.bulkInsert('reservas', reservas.map(r => {
+      return {
+        idSala: r.idSala,
+        idUsuario: r.idUsuario,
+        idRecepcionista: r.idRecepcionista,
+        dataReservada: r.dataReservada,
+        horaInicio: r.horaInicio,
+        horaFimReserva: r.horaFimReserva,
+        statusReserva: r.statusReserva,
+        dataModificacaoStatus: r.dataModificacaoStatus,
+        motivoReserva: r.motivoReserva,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt
+      };
+    }), {});
   },
 
   async down (queryInterface, Sequelize) {
