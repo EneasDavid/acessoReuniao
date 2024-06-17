@@ -17,7 +17,7 @@ class hashServices extends Services{
 
     async gerarHash(senhaSalted){
         try{
-            let hash = crypto.createHash('sha256');
+            let hash=crypto.createHash('sha256');
             hash.update(senhaSalted);
             return hash.digest('hex');
         }catch(error){
@@ -41,14 +41,12 @@ class hashServices extends Services{
             console.log(idRecepcionista);
             let salt = await this.buscarSalt(idRecepcionista);
             if (!salt) throw new Error('Salt não encontrado');
-            let hashed = await this.gerarHash(salt + senha);
+            let hashed = await this.gerarHash(salt+senha);
             return hashed === senhaHashed;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'SaltSenha', 'verificarSenha');
             throw error;
         }
     }
-
-
 }
-module.exports = hashServices;
+module.exports=hashServices;

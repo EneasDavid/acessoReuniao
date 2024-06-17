@@ -12,12 +12,10 @@ module.exports = {
       idResponsavel: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        /*
         references:{
           model: 'recepcionistas',
           key: 'id'
         }
-        */
       },
       idReservaMotivo: {
         type: Sequelize.INTEGER,

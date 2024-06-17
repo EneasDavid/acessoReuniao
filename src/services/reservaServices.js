@@ -17,7 +17,7 @@ class ReservaServices extends Services{
             motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional().nullish(),
           }));
     }
-    
+
     async gerarHoraFim(horaInicio, duracao) {
         try {
             const horaInicioDate = new Date(horaInicio);
@@ -59,13 +59,7 @@ class ReservaServices extends Services{
 
     async verificaHorarioReserva(id_sala, dataReservada) {
         try{
-            const reservas = await dataSource.Reserva.findAll({
-                where: {
-                    idSala: id_sala,
-                    dataReservada: dataReservada,
-                    statusReserva: ['confirmada', 'pendente']
-                }
-            });
+            const reservas = await dataSource.Reserva.findAll({where: {idSala: id_sala,dataReservada: dataReservada,statusReserva: ['confirmada', 'pendente']}});
             return reservas.length > 0;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'verificaHorarioReserva');
@@ -77,14 +71,7 @@ class ReservaServices extends Services{
         try{
             const reservaDia = await this.verificaHorarioReserva(id_sala, dataReservada);
             if (!reservaDia) return false;
-            const reserva = await dataSource.Reserva.findOne({
-                where: {
-                    idSala: id_sala,
-                    dataReservada: dataReservada,
-                    horaInicio: horaReservada,
-                    statusReserva: ['confirmada', 'pendente']
-                }
-            });
+            const reserva = await dataSource.Reserva.findOne({where: {idSala: id_sala,dataReservada: dataReservada,horaInicio: horaReservada,statusReserva: ['confirmada', 'pendente']}});
             return reserva;
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'verificaDisponibilidade');

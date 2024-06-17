@@ -31,13 +31,11 @@ module.exports = {
       },
       nivelAcesso: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        /*      
+        allowNull: false,      
         references: {
           model: 'nivelAcessos',
           key: 'id'
         }
-        */
       },
       createdAt: {
         allowNull: false,

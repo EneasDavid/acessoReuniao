@@ -30,12 +30,10 @@ module.exports = {
       idRecepcionista: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        /*
         references:{
           model: 'recepcionistas',
           key: 'id'
-        },
-        */        
+        },        
       },
 
       dataReservada: {
