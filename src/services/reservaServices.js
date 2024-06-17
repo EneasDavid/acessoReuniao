@@ -84,7 +84,7 @@ class ReservaServices extends Services{
             const response = await this.verificaDisponibilidade(novoRegistro.idSala, novoRegistro.dataReservada, novoRegistro.horaInicio);
             if (response) return { error: 'Sala já reservada' };
     
-            novoRegistro.statusReserva = 'pendente';
+            novoRegistro.statusReserva = 'PENDENTE';
 
             const [novoHorarioInicio, novaHorarioFim, dataReservadaFormata, dataModificaStatusFormata] = await Promise.all([
                      this.formatarHora(new Date(novoRegistro.horaInicio)),
@@ -154,12 +154,12 @@ class ReservaServices extends Services{
 
     async confirmarReserva(id){
         const atualizacao={
-            statusReserva:'confirmado',
+            statusReserva:'CONFIRMADO',
             dataModificacaoStatus: await this.formatarData(new Date())
         };
         try{
             const reserva = await this.pegaUmRegistro(id);
-            if(reserva.statusReserva === 'pendente') return await dataSource.Reserva.update(atualizacao, { where: { id } }); 
+            if(reserva.statusReserva === 'PENDENTE') return await dataSource.Reserva.update(atualizacao, { where: { id } }); 
             await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'confirmarEntrega');
             throw new Error({error: 'Reserva já confirmada'});
         }catch(error){
@@ -170,12 +170,12 @@ class ReservaServices extends Services{
 
     async concluirReserva(id, concluirReserva){
         const concluir={
-            statusReserva:'concluido',
+            statusReserva:'CONCLUIDO',
             dataModificacaoStatus: await this.formatarData(new Date())
         };
         try{
             const reserva=await this.pegaUmRegistro(id);
-            if(reserva.statusReserva==='confirmado'){
+            if(reserva.statusReserva==='CONFIRMADO'){
                 if(concluirReserva.infracao){
                     const idResponsavel = reserva.idUsuario;
                     const motivo = concluirReserva.motivoInfracao;
