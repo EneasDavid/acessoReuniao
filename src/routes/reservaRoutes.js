@@ -15,6 +15,7 @@ router.post('/reserva/email', verificarToken(2), (req, res)=>reservaController.e
 router.put('/reserva/:id', verificarToken(2), (req, res)=>reservaController.atualizar(req, res));
 router.put('/reserva/concluir/:id', verificarToken(2), (req, res)=>reservaController.concluirReserva(req, res));
 router.put('/reserva/confirmar/:id', verificarToken(2), (req, res)=>reservaController.confirmarReserva(req, res));
+router.put('/reserva/cancelar/:id', verificarToken(2), (req, res)=>reservaController.cancelarReserva(req, res));
 router.delete('/reserva/:id', verificarToken(1), (req, res)=>reservaController.deleta(req,res));
 
 

@@ -9,31 +9,31 @@ module.exports = {
         andar: 0,
         area: 'coorwoking',
         capMax: 5,
-        situacao: 'A',
+        situacao: 'D',
         createdAt: new Date(),
         updatedAt: new Date()
       },{
           nome: 'Sala 2',
-          andar: 0,
+          andar: 1,
           area: 'coorwoking',
           capMax: 5,
-          situacao: 'A',
+          situacao: 'D',
           createdAt: new Date(),
           updatedAt: new Date()
       },{
           nome: 'Sala 3',
-          andar: 0,
+          andar: 2,
           area: 'coorwoking',
           capMax: 5,
-          situacao: 'A',
+          situacao: 'I',
           createdAt: new Date(),
           updatedAt: new Date()
       },{
           nome: '116',
-          andar: 1,
+          andar: 3,
           area: 'sala de reunião',
           capMax: 15,
-          situacao: 'A',
+          situacao: 'm',
           createdAt: new Date(),
           updatedAt: new Date()
       },  

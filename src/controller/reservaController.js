@@ -67,6 +67,16 @@ class ReservaController extends Controller{
         }
     }
 
+    async cancelarReserva(req, res){
+        const id = req.params.id;
+        try {
+            const result = await reservaServices.cancelarReserva(id);
+            res.status(200).json({ message: 'Reserva cancelada com sucesso', data: result });
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao cancelar reserva', error: error.message });
+        }
+    }
+
     async confirmarReserva(req, res){
         const id = req.params.id;
         try {

@@ -168,6 +168,24 @@ class ReservaServices extends Services{
         }
     }
 
+    async cancelarReserva(id){
+        const cancelar={
+            statusReserva:'CANCELADO',
+            dataModificacaoStatus: await this.formatarData(new Date())
+        };
+        try{
+            const reserva=await this.pegaUmRegistro(id);
+            if(reserva.statusReserva==='PENDENTE'){
+                return await dataSource.Reserva.update(cancelar, { where: { id } });
+            }
+            await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'cancelarReserva');
+            throw new Error({error: 'Reserva já cancelada ou inda confirmada'});
+        }catch(error){
+            await this.salvarErro(error.name, error.message, 'Reserva', 'cancelarReserva');
+            throw error;
+        }
+    }
+
     async concluirReserva(id, concluirReserva){
         const concluir={
             statusReserva:'CONCLUIDO',
