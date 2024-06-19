@@ -17,6 +17,7 @@ module.exports = {
           model: 'salas',
           key: 'id'
         },
+        onDelete: 'CASCADE'
       },
      idUsuario: {
         type: Sequelize.INTEGER,
@@ -25,6 +26,7 @@ module.exports = {
           model: 'usuarios',
           key: 'id'
         },
+        onDelete: 'CASCADE'
       },
   
       idRecepcionista: {
@@ -34,6 +36,7 @@ module.exports = {
           model: 'recepcionistas',
           key: 'id'
         },        
+        onDelete: 'CASCADE'
       },
 
       dataReservada: {

@@ -96,7 +96,6 @@ class ReservaServices extends Services{
             novoRegistro.horaFimReserva = novaHorarioFim;
             novoRegistro.dataReservada = dataReservadaFormata; 
             novoRegistro.dataModificacaoStatus = dataModificaStatusFormata; 
-            console.log(novoRegistro);
             await this.validarDados(novoRegistro);
             
             return await dataSource.Reserva.create(novoRegistro);

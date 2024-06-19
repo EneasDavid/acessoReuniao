@@ -7,15 +7,21 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Reserva.belongsTo(models.Sala, {
         foreignKey: 'idSala',
-        as: 'salas'
+        as: 'salas',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
       Reserva.belongsTo(models.Usuario, {
         foreignKey: 'idUsuario',
-        as: 'usuarios'
+        as: 'usuarios',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
       Reserva.belongsTo(models.Recepcionista, {
         foreignKey: 'idRecepcionista',
-        as: 'recepcionistas'
+        as: 'recepcionistas',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
     }
   }

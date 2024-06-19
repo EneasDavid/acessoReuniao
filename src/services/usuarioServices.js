@@ -1,5 +1,6 @@
 const Services=require('./services.js');
 const z=require('zod');
+const dataSource = require('../models/index.js');
 
 class UsuarioServices extends Services{
     constructor(){
@@ -11,6 +12,14 @@ class UsuarioServices extends Services{
             numTelefone:z.string().min(11).max(11),
             dataNascimento:z.string().date(),
         }));
+    }
+    async consularUsuario(cpf, aniversario){
+        try{
+            return await this.UsuariofindOne({identificador:cpf, dataNascimento:aniversario});
+        }catch(error){
+            await this.salvarErro(error.name, error.message, 'Usuario', 'consularUsuario');
+            throw error;
+        }
     }
 }
 

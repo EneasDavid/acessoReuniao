@@ -35,7 +35,8 @@ module.exports = {
         references: {
           model: 'nivelAcessos',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,

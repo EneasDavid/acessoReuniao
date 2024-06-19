@@ -8,10 +8,15 @@ module.exports = (sequelize, DataTypes) => {
       ListaNegra.belongsTo(models.Usuario, {
         foreignKey: 'idResponsavel',
         as: 'usuario',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
       ListaNegra.belongsTo(models.Reserva, {
         foreignKey: 'idReservaMotivo',
         as: 'reserva',
+        onDelete: 'SET NULL', 
+        hooks: true 
+
       });
     }
   }

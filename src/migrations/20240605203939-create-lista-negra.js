@@ -15,7 +15,8 @@ module.exports = {
         references:{
           model: 'recepcionistas',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE'
       },
       idReservaMotivo: {
         type: Sequelize.INTEGER,
@@ -23,7 +24,8 @@ module.exports = {
         references:{
           model: 'reservas',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE'
       },
       codBloqueio: {
         type: Sequelize.STRING,

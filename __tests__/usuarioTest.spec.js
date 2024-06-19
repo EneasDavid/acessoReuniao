@@ -30,6 +30,15 @@ describe('Teste das rotas de usuario', () => {
         expect(response.status).toBe(200);
     });
 
+    it('Deve retornar um usario pelo CPF e pelo aniversaio', async()=>{
+        const token = gerarToken(1); 
+        const response = await request(app)
+            .get('/usuario')
+            .query({identificador: '00000000000', dataNascimento: '2003-12-03'})
+            .set('Authorization', `Bearer ${token}`);
+        expect(response.status).toBe(200);
+
+    });
     it('Deve criar um novo usuario', async()=>{
         const token = gerarToken(1); 
         const response = await request(app)

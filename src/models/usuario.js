@@ -7,7 +7,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Usuario.hasMany(models.Reserva, {
         foreignKey: 'idUsuario',
-        as: 'reservas'
+        as: 'reservas',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
     }
   }

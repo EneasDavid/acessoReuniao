@@ -8,6 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       NivelAcesso.hasMany(models.Recepcionista, {
         foreignKey: 'nivelAcesso',
         as: 'recepcionistas',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
     }
   }

@@ -7,11 +7,15 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Sala.hasMany(models.Reserva, {
         foreignKey: 'idSala',
-        as: 'reservas'
+        as: 'reservas',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
       Sala.hasMany(models.EstadoSala, {
         foreignKey: 'idSala',
-        as: 'estados'
+        as: 'estados',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
     }
   }

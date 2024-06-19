@@ -8,6 +8,7 @@ router.get('/usuario', verificarToken(2), (req, res) => usuarioController.pegaTo
 router.get('/usuario/:id', verificarToken(2), (req, res) => usuarioController.pegaPorId(req,res));
 router.post('/usuario', verificarToken(2), (req, res) => usuarioController.cria(req, res));
 router.put('/usuario/:id', verificarToken(2), (req, res) => usuarioController.atualiza(req, res));
+router.get('/usuario/consulta', verificarToken(2), (req, res) => usuarioController.consulta(req, res));
 router.delete('/usuario/:id', verificarToken(1), (req, res) => usuarioController.deleta(req,res));
 
 module.exports=router;

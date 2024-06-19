@@ -7,11 +7,15 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Recepcionista.hasMany(models.Reserva, {
         foreignKey: 'idRecepcionista',
-        as: 'reservas'
+        as: 'reservas',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
       Recepcionista.belongsTo(models.NivelAcesso, {
         foreignKey: 'nivelAcesso',
-        as: 'nivelAcessos'
+        as: 'nivelAcessos',
+        onDelete: 'SET NULL', 
+        hooks: true 
       });
       Recepcionista.hasOne(models.saltSenha, {
         foreignKey: 'idRecepcionista',

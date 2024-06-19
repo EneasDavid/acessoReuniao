@@ -43,7 +43,7 @@ class recepcionistaServices extends Services{
     
             // Gerar token JWT
             const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '86400s' }); 
-            return token;
+            return {'token':token, 'nivelAcesso': usuario.nivelAcesso};
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'login');
             throw error;

@@ -19,7 +19,8 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true 
       },
       numTelefone: {
         type: Sequelize.STRING,
@@ -43,6 +44,7 @@ module.exports = {
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('usuarios');
   }
