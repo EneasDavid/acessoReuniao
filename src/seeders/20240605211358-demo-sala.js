@@ -33,7 +33,7 @@ module.exports = {
           andar: 3,
           area: 'sala de reunião',
           capMax: 15,
-          situacao: 'm',
+          situacao: 'M',
           createdAt: new Date(),
           updatedAt: new Date()
       },  

@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     codBloqueio: DataTypes.STRING,
     motivo: DataTypes.STRING,
     dataBloqueio: DataTypes.STRING,
+    estadoBloqueio: DataTypes.BOOLEAN,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {

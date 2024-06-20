@@ -39,6 +39,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      estadoBloqueio: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

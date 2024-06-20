@@ -27,6 +27,7 @@ module.exports = {
       },
       situacao: {
         type: Sequelize.CHAR,
+        defaultValue: 'D',
         allowNull: false
       },
       createdAt: {

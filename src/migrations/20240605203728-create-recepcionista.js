@@ -27,6 +27,7 @@ module.exports = {
       },
       ativo: {
         type: Sequelize.BOOLEAN,
+        defaultValue: true,
         allowNull: false
       },
       nivelAcesso: {

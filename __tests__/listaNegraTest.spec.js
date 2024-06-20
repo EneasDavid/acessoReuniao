@@ -3,7 +3,7 @@ const app = 'http://localhost:3000';
 const gerarToken=require('../src/middleware/criarTolke.js');
 
 describe('Teste das rotas de listaNegra', () => {
-    const atributos = ['idResponsavel', 'idReservaMotivo', 'motivo','dataBloqueio'];
+    const atributos = ['idResponsavel', 'idReservaMotivo', 'motivo', 'dataBloqueio', 'estadoBloqueio'];
     const validData = {
         id:2, //Importante travar no id 2 para não dar erro
         idResponsavel: 1,

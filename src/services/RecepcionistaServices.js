@@ -1,6 +1,5 @@
 const Services=require("./services.js");
 const hashServices=require("./saltSenha.js")
-// const modelGeral=require("../models");
 const dataSource = require('../models/index.js');
 const z=require('zod');
 const jwt=require('jsonwebtoken');
@@ -12,7 +11,6 @@ class recepcionistaServices extends Services{
             senha:z.string().min(38,{message:"O campo de senha necessita de NO MINIMO 8 caracteres"}).max(255,{message:"O campo de senha necessita de NO MAXIMO 255 caracteres"}),
             nome:z.string().min(3,{message:"O campo de nome necessita de NO MINIMO 3 caracteres"}).max(255,{message:"O campo de nome necessita de NO MAXIMO 255 caracteres"}),
             sobrenome:z.string().min(4,{message:"O campo de sobrenome necessita de NO MINIMO 4 caracteres"}).max(255,{message:"O campo de sobrenome necessita de NO MAXIMO 255 caracteres"}),
-            ativo:z.boolean(),
             nivelAcesso:z.number().int({message:"O campo de nivel de acesso necessita ser um numero inteiro"}).positive({message:"O campo de nivel de acesso necessita ser um numero inteiro positivo"}),
         }));
         this.hashService = new hashServices();
@@ -37,7 +35,7 @@ class recepcionistaServices extends Services{
         try {
             let usuario = await dataSource.Recepcionista.findOne({ where: { login } });
             if (!usuario) throw new Error('Login inválido ou inexistente');
-    
+            if(!usuario.ativo) throw new Error('Usuário inativo');
             let senhaValida = await this.hashService.verificarSenha(senha, usuario.senha, usuario.id);
             if (!senhaValida) throw new Error('Senha ou login inválidos');
     
