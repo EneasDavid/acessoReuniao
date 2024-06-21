@@ -13,14 +13,14 @@ class UsuarioServices extends Services{
             dataNascimento:z.string().date(),
         }));
     }
-    async consularUsuario(cpf, aniversario){
-        try{
-            return await this.UsuariofindOne({identificador:cpf, dataNascimento:aniversario});
-        }catch(error){
-            await this.salvarErro(error.name, error.message, 'Usuario', 'consularUsuario');
-            throw error;
+    async consultarUsuario(identificador, dataNascimento) {
+        try {
+            return await dataSource.Usuario.findOne({where:{identificador, dataNascimento}});
+        } catch (error) {
+          await this.salvarErro(error.name, error.message, 'Usuario', 'consultarUsuario');
+          throw error;
         }
-    }
+      }
 }
 
 module.exports=UsuarioServices;
