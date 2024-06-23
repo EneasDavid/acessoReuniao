@@ -5,7 +5,7 @@ const gerarToken=require('../src/middleware/criarTolke.js');
 describe('Teste das rotas de reserva', ()=>{
     const atributos = ['idSala', 'idUsuario', 'idRecepcionista', 'dataReservada', 'horaInicio', 'statusReserva'];
     const validData = {
-        id:5,
+        //id:5,
         idSala:2,
         idUsuario:1,
         idRecepcionista:1,
@@ -20,7 +20,7 @@ describe('Teste das rotas de reserva', ()=>{
             .get('/reserva')
         expect(response.status).toBe(200);
     });
-    it('Deve criar uma nova reserva', async()=>{
+    it.only('Deve criar uma nova reserva', async()=>{
         const token = gerarToken(1); 
         const response = await request(app)
             .post('/reserva')

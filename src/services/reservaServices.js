@@ -41,7 +41,7 @@ class ReservaServices extends Services{
 
     async formatarData(data) {
         try {
-            return `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}/${data.getFullYear().toString().padStart(4, '0')}`;
+            return `${data.getDate().toString().padStart(2, '0')}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getFullYear().toString().padStart(4, '0')}`;
         } catch (error) {
             this.salvarErro(error.name, error.message, 'reserva', 'formatarData');
             throw error;
