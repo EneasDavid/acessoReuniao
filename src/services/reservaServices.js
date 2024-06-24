@@ -57,15 +57,23 @@ class ReservaServices extends Services{
         }
     }
 
-    async verificaHorarioReserva(id_sala, dataReservada) {
-        try{
-            const reservas = await dataSource.Reserva.findAll({where: {idSala: id_sala,dataReservada: dataReservada,statusReserva: ['confirmada', 'pendente']}});
-            return reservas.length > 0;
-        }catch(error){
+    async verificaHorarioReserva(idSala, dataReservada) {
+        try {
+            const reservas = await dataSource.Reserva.findAll({
+                where: {
+                    idSala: idSala,
+                    dataReservada: dataReservada,
+                    statusReserva: ['CONFIRMADO', 'PENDENTE']
+                }
+            });
+            return reservas;
+        } catch (error) {
+            console.error('Erro ao verificar horário de reserva:', error);
             await this.salvarErro(error.name, error.message, 'Reserva', 'verificaHorarioReserva');
             throw error;
         }
     }
+    
     
     async verificaDisponibilidade(id_sala, dataReservada, horaReservada) {
         try{
