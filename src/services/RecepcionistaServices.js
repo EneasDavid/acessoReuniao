@@ -17,13 +17,18 @@ class recepcionistaServices extends Services{
     }
 
     async criarRecepcionista(novoRegistro){
+        let usuario = await dataSource.Recepcionista.findOne({where:{login:novoRegistro.login}});
+        if (usuario){
+            await this.salvarErro('login já existe', 'foi informado um login que já existe no banco', 'Recepcionista', 'cadastro');
+            return {status: 409 };
+        }
         try{
             let salt = await this.hashService.gerarCaracteres();
             let hashed = await this.hashService.gerarHash(salt + novoRegistro.senha);
             novoRegistro.senha = hashed;
             let novoRecepcionista = await this.criaRegistro(novoRegistro);
             await this.hashService.criaRegistro({ idRecepcionista: novoRecepcionista.id, salt: salt });
-            return novoRecepcionista;
+            return {status: 200, novoRecepcionista};
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Recepcionista', 'criaRecepcioninsta');
             throw error;

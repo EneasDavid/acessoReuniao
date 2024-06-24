@@ -11,11 +11,17 @@ class RecepcionistaController extends Controller{
         const novoRegistro = req.body;
         try{
             const novoRegistroCriado = await recepcionistaServices.criarRecepcionista(novoRegistro);
-            return res.status(200).json(novoRegistroCriado);
+            switch (novoRegistroCriado.status) {
+                case 409:
+                    return res.status(409).json({ message: 'Login já existe' });
+                case 200: 
+                    return res.status(200).json(novoRegistroCriado);
+            }
         }catch(erro){
             return res.status(500).json({error:erro.name, message:erro.message, model:'Recepcionista', method:'cria'});
         }
     }
+    
     async login(req, res) {
         const { login, senha } = req.body;
         try {
