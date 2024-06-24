@@ -11,6 +11,7 @@ module.exports = {
       },
       identificador: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: false
       },
       nome: {
@@ -24,6 +25,7 @@ module.exports = {
       },
       numTelefone: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: false
       },
       sobrenome: {

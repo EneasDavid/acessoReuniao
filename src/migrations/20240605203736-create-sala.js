@@ -11,6 +11,7 @@ module.exports = {
       },
       nome: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: false
       },
       andar: {

@@ -20,7 +20,7 @@ describe('Teste das rotas de reserva', ()=>{
             .get('/reserva')
         expect(response.status).toBe(200);
     });
-    it.only('Deve criar uma nova reserva', async()=>{
+    it('Deve criar uma nova reserva', async()=>{
         const token = gerarToken(1); 
         const response = await request(app)
             .post('/reserva')

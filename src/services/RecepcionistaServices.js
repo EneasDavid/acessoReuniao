@@ -30,23 +30,31 @@ class recepcionistaServices extends Services{
         }
     }
     
-
     async login(login, senha) {
         try {
             let usuario = await dataSource.Recepcionista.findOne({ where: { login } });
-            if (!usuario) throw new Error('Login inválido ou inexistente');
-            if(!usuario.ativo) throw new Error('Usuário inativo');
+            if (!usuario){
+                await this.salvarErro('login invalido', 'foi informado um login que não existe no banco', 'Recepcionista', 'login');
+                return {status: 404 };
+            }
+            if (!usuario.ativo){
+                await this.salvarErro('recepcionisita inativo', 'foi informado um login que não está ativo', 'Recepcionista', 'login');
+                return { status: 403 };  
+            } 
             let senhaValida = await this.hashService.verificarSenha(senha, usuario.senha, usuario.id);
-            if (!senhaValida) throw new Error('Senha ou login inválidos');
-    
+            if (!senhaValida){
+                await this.salvarErro('senha invalida', 'foi informado um login correto, porém a senha está incorreta', 'Recepcionista', 'login');
+                return { status: 401 };
+            } 
             // Gerar token JWT
-            const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '86400s' }); 
-            return {'token':token, 'nivelAcesso': usuario.nivelAcesso};
+            const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '24h' });
+            return { status: 200, token, nivelAcesso: usuario.nivelAcesso };
         } catch (error) {
-            await this.salvarErro(error.name, error.message, 'Recepcionista', 'login');
-            throw error;
+            console.error('Erro no serviço de login:', error);
+            throw error; // Propaga o erro para o controlador tratar
         }
     }
+    
     
 }
 
