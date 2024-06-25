@@ -8,13 +8,16 @@ module.exports = {
     const [dataReservada, horaInicio]= await Promise.all([
       reservasServices.formatarData(new Date()), 
       reservasServices.formatarHora(new Date())]);
+      const agora = new Date();
+    const horas = agora.getHours().toString().padStart(2, '0');
+    const minutos = agora.getMinutes().toString().padStart(2, '0');   
     const reservas=[{
       idSala: 1,
       idUsuario: 1,
       idRecepcionista: 1,
       dataReservada: dataReservada,
       horaInicio: horaInicio,
-      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+        horaFimReserva: await reservasServices.gerarHoraFim(`${horas}:${minutos}`,3),
       statusReserva: 'PENDENTE',
       dataModificacaoStatus:null,
       motivoReserva: 'estudo coletivo',      
@@ -26,7 +29,7 @@ module.exports = {
       idRecepcionista: 1,
       dataReservada: dataReservada,
       horaInicio: horaInicio,
-      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      horaFimReserva: await reservasServices.gerarHoraFim(`${horas}:${minutos}`,3),
       statusReserva: 'PENDENTE',
       dataModificacaoStatus:null,
       motivoReserva: 'estudo coletivo',      
@@ -38,7 +41,7 @@ module.exports = {
       idRecepcionista: 1,
       dataReservada: dataReservada,
       horaInicio: horaInicio,
-      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      horaFimReserva: await reservasServices.gerarHoraFim(`${horas}:${minutos}`,3),
       statusReserva: 'PENDENTE',
       dataModificacaoStatus:null,
       motivoReserva: 'estudo coletivo',      
@@ -50,7 +53,7 @@ module.exports = {
       idRecepcionista: 2,
       dataReservada: dataReservada,
       horaInicio: horaInicio,
-      horaFimReserva: await reservasServices.gerarHoraFim(new Date(),3),
+      horaFimReserva: await reservasServices.gerarHoraFim(`${horas}:${minutos}`,3),
       statusReserva: 'PENDENTE',
       dataModificacaoStatus:null,      
       createdAt: new Date(),
