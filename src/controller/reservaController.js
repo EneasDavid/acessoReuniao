@@ -4,7 +4,10 @@ const reservaServices=new ReservaServices();
 
 class ReservaController extends Controller {
     constructor() {
-        super(reservaServices);
+        super(reservaServices,{
+            mensagemNaoEncontrado:'Reserva não encontrada',
+            mensagemJaExiste:'Já existe uma reserva com esses dados'
+        });
     }
 
     async reservasStatus(req, res){
@@ -22,8 +25,8 @@ class ReservaController extends Controller {
         try {
             const response = await reservaServices.verificaHorarioReserva(idSala, dataReservada);
             switch (response.status){
-                case 404:
-                    return res.status(404).json({ message: 'Horário indisponível' });
+                case 409:
+                    return res.status(409).json({ message: 'Horário já está reservado' });
                 case 200:
                     return res.status(200).json(response);
             }
@@ -37,8 +40,8 @@ class ReservaController extends Controller {
         try {
             const response = await reservaServices.verificaDisponibilidade(idSala, dataReservada, horaReservada);
             switch (response.status) {
-                case 404:
-                    return res.status(404).json({ message: 'Sala indisponível' });
+                case 409:
+                    return res.status(409).json({ message: 'Horário já está reservado' });
                 case 200:
                     return res.status(200).json(response);
             }
@@ -53,9 +56,9 @@ class ReservaController extends Controller {
             const novoRegistroCriado = await reservaServices.criaRegistro(novoRegistro);
             switch (novoRegistroCriado.status) {
                 case 409:
-                    return res.status(409).json({ message: 'Conflito: A reserva já existe' });
-                case 200:
-                    return res.status(200).json(novoRegistroCriado);
+                    return res.status(409).json({ message: 'Reserva já existe' });
+                case 201:
+                    return res.status(201).json(novoRegistroCriado);
             }
         } catch (erro) {
             return res.status(500).json({ error: erro.name, message: erro.message, model: 'Reserva', method: 'cria' });
@@ -68,6 +71,8 @@ class ReservaController extends Controller {
             const dadosAtualizados = req.body;
             const registroAtualizado = await reservaServices.atualizar(dadosAtualizados, id);
             switch (registroAtualizado.status){
+                case 409:
+                    return res.status(409).json({ message: 'Já existe uma reserva com esses dados' });
                 case 404:
                     return res.status(404).json({ message: 'Reserva não encontrada' });
                 case 200:

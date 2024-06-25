@@ -4,7 +4,10 @@ const recepcionistaServices=new RecepcionistaServices();
 
 class RecepcionistaController extends Controller{
     constructor(){
-        super(recepcionistaServices);
+        super(recepcionistaServices,{
+            mensagemNaoEncontrado:'Recepcionista não encontrado',
+            mensagemJaExiste:'Já existe um recepcionista com esses dados'
+        });
     }
 
     async cria(req, res){
@@ -14,8 +17,8 @@ class RecepcionistaController extends Controller{
             switch (novoRegistroCriado.status) {
                 case 409:
                     return res.status(409).json({ message: 'Login já existe' });
-                case 200: 
-                    return res.status(200).json(novoRegistroCriado);
+                case 201: 
+                    return res.status(201).json(novoRegistroCriado);
             }
         }catch(erro){
             return res.status(500).json({error:erro.name, message:erro.message, model:'Recepcionista', method:'cria'});

@@ -4,7 +4,10 @@ const usuarioServices=new UsuarioServices();
 
 class UsuarioController extends Controller{
     constructor(){
-        super(usuarioServices);
+        super(usuarioServices,{
+          mensagemNaoEncontrado:'Usuário não encontrado',
+          mensagemJaExiste:'Já existe um usuário com esses dados'
+        });
     }
     async consultarUsuario(req, res) {
         const { identificador, dataNascimento } = req.params;

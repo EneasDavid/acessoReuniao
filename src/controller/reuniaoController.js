@@ -4,7 +4,10 @@ const reuniaoServices=new ReuniaoServices();
 
 class ReuniaoController extends Controller{
     constructor(){
-        super(reuniaoServices);
+        super(reuniaoServices,{
+            mensagemNaoEncontrado:'Reuniao não encontrada',
+            mensagemJaExiste:'Já existe uma reuniao com esses dados'
+        });
     }
 }
 
