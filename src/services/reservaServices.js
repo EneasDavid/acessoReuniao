@@ -18,12 +18,12 @@ class ReservaServices extends Services{
           }));
     }
 
-    async gerarHoraFim(horaInicio, duracao) {
+    async gerarHoraFim(hora, duracao) {
         try {
-            const horaInicioDate = new Date(horaInicio);
-            horaInicioDate.setHours(horaInicioDate.getHours() + parseInt(duracao));
-            const novaHoraString = await this.formatarHora(horaInicioDate);
-            return novaHoraString;
+            const [horaSeparada, minuto] = hora.split(':').map(Number);
+            let novaHora=horaSeparada+duracao;
+            if(novaHora>=23) novaHora-=23;
+            return `${novaHora.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}`;
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'reserva', 'gerarHoraFim');
             throw error;
@@ -89,24 +89,17 @@ class ReservaServices extends Services{
     
     async criaRegistro(novoRegistro) {
         try {
+            console.log(novoRegistro);
             const response = await this.verificaDisponibilidade(novoRegistro.idSala, novoRegistro.dataReservada, novoRegistro.horaInicio);
-            if (response) return { error: 'Sala já reservada' };
+            if (response) return { status: 409 };
     
             novoRegistro.statusReserva = 'PENDENTE';
-
-            const [novoHorarioInicio, novaHorarioFim, dataReservadaFormata, dataModificaStatusFormata] = await Promise.all([
-                     this.formatarHora(new Date(novoRegistro.horaInicio)),
-                     this.gerarHoraFim(novoRegistro.horaInicio, 3),
-                     this.formatarData(new Date(novoRegistro.dataReservada)),
-                     this.formatarData(new Date(novoRegistro.dataModificacaoStatus)),
-            ]);
-            novoRegistro.horaInicio = novoHorarioInicio;
-            novoRegistro.horaFimReserva = novaHorarioFim;
-            novoRegistro.dataReservada = dataReservadaFormata; 
-            novoRegistro.dataModificacaoStatus = dataModificaStatusFormata; 
-            await this.validarDados(novoRegistro);
+            novoRegistro.horaFimReserva = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
+            novoRegistro.dataModificacaoStatus =  novoRegistro.dataReservada; 
             
-            return await dataSource.Reserva.create(novoRegistro);
+            await this.validarDados(novoRegistro);
+            const res=await dataSource.Reserva.create(novoRegistro);
+            if(res) return {status:200, data:res};
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');
             throw error;

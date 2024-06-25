@@ -53,7 +53,7 @@ class recepcionistaServices extends Services{
             } 
             // Gerar token JWT
             const token = jwt.sign({ id: usuario.id }, palavraPasse, { expiresIn: '24h' });
-            return { status: 200, token, nivelAcesso: usuario.nivelAcesso };
+            return { status: 200, token, nivelAcesso: usuario.nivelAcesso, id: usuario.id};
         } catch (error) {
             console.error('Erro no serviço de login:', error);
             throw error; // Propaga o erro para o controlador tratar

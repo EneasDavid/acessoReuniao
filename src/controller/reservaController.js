@@ -55,11 +55,15 @@ class ReservaController extends Controller {
                 case 409:
                     return res.status(409).json({ message: 'Conflito: A reserva já existe' });
                 case 200:
-                    return res.status(200).json(novoRegistroCriado);
+                    return res.status(200).json(novoRegistroCriado.data);
+                default:
+                    return res.status(novoRegistroCriado.status).json({ message: 'Erro não esperado' });
             }
-        } catch (erro) {
-            return res.status(500).json({ error: erro.name, message: erro.message, model: 'Reserva', method: 'cria' });
+        } catch (error) {
+            console.error('Erro ao criar registro:', error);
+            return res.status(500).json({ message: 'Erro interno do servidor' });
         }
+        
     }
 
     async atualizar(req, res){
