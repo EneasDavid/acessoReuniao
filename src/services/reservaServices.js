@@ -66,7 +66,7 @@ class ReservaServices extends Services{
                     statusReserva: ['CONFIRMADO', 'PENDENTE']
                 }
             });
-            return reservas;
+            return {status:200, data: reservas};
         } catch (error) {
             console.error('Erro ao verificar horário de reserva:', error);
             await this.salvarErro(error.name, error.message, 'Reserva', 'verificaHorarioReserva');

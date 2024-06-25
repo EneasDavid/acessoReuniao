@@ -25,7 +25,7 @@ class ReservaController extends Controller {
                 case 404:
                     return res.status(404).json({ message: 'Horário indisponível' });
                 case 200:
-                    return res.status(200).json(response);
+                    return res.status(200).json(response.data);
             }
         } catch (erro) {
             return res.status(500).json({ error: erro.name, message: erro.message, model: 'Reserva', method: 'verificaHorarioReservaExistente' });
