@@ -159,12 +159,14 @@ class ReservaServices extends Services{
         };
         try{
             const reserva = await this.pegaUmRegistro(id);
-            if(reserva.statusReserva === 'PENDENTE') return await dataSource.Reserva.update(atualizacao, { where: { id } }); 
+            if(reserva.statusReserva === 'PENDENTE'){
+                const request=await dataSource.Reserva.update(atualizacao, { where: { id } }); 
+                if(request) return {status:200, data:request};
+            }
             await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'confirmarEntrega');
-            throw new Error({error: 'Reserva já confirmada'});
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'confirmarEntrega');
-            throw error;
+            return{status:404};
         }
     }
 
@@ -176,17 +178,18 @@ class ReservaServices extends Services{
         try{
             const reserva=await this.pegaUmRegistro(id);
             if(reserva.statusReserva==='PENDENTE'){
-                return await dataSource.Reserva.update(cancelar, { where: { id } });
+                const request=await dataSource.Reserva.update(cancelar, { where: { id } });
+                if(request) return {status:200, data:request}
             }
             await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'cancelarReserva');
-            throw new Error({error: 'Reserva já cancelada ou inda confirmada'});
+            return {status:404}
         }catch(error){
             await this.salvarErro(error.name, error.message, 'Reserva', 'cancelarReserva');
             throw error;
         }
     }
 
-    async concluirReserva(id, concluirReserva){
+    async concluirReserva(id){
         const concluir={
             statusReserva:'CONCLUIDO',
             dataModificacaoStatus: await this.formatarData(new Date())
@@ -194,16 +197,17 @@ class ReservaServices extends Services{
         try{
             const reserva=await this.pegaUmRegistro(id);
             if(reserva.statusReserva==='CONFIRMADO'){
-                if(concluirReserva.infracao){
+              /*  if(concluirReserva.infracao){
                     const idResponsavel = reserva.idUsuario;
                     const motivo = concluirReserva.motivoInfracao;
                     const registroInfracao = { idResponsavel, id, motivo};
                     await listaNegraServices.criaRegistro(registroInfracao);
-                }
-                return await dataSource.Reserva.update(concluir, { where: { id } });
+                }*/
+               const resquest=await dataSource.Reserva.update(concluir, { where: { id } });
+               if(resquest) return {status:200, data:resquest};
             }
             await this.salvarErro('status incorreto', 'Reserva não está CONFIRMADO', 'Reserva', 'concluirReserva');
-            throw new Error({error: 'Reserva já Concluida ou inda pendente'});
+            return {status:404};
         }catch{
             await this.salvarErro(error.name, error.message, 'Reserva', 'concluirReserva');
             throw error;
