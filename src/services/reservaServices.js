@@ -1,6 +1,8 @@
 const Services=require('./services.js');
 const listaNegraServices=require('./listaNegraServices.js');
 const dataSource = require('../models/index.js');
+const emailEnviar = require('./emailServices.js');
+
 const z=require('zod');
 
 class ReservaServices extends Services{
@@ -16,6 +18,7 @@ class ReservaServices extends Services{
             statusReserva:z.string().min(7,'O campo status necessita de no minimo 7 caracteres').max(10,'O campo status necessita de no maximo 10 caracteres'),
             motivoReserva:z.string().min(5,{message:"o campo motivoReserva necessita de NO MINIMO 5 caracteres"}).max(255,{message:"o campo motivoReserva necessita de NO MAXIMO 255 caracteres"}).optional().nullish(),
           }));
+          this.emailSend = new emailEnviar();
     }
 
     async gerarHoraFim(hora, duracao) {
@@ -95,16 +98,29 @@ class ReservaServices extends Services{
     
             novoRegistro.statusReserva = 'PENDENTE';
             novoRegistro.horaFimReserva = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
-            novoRegistro.dataModificacaoStatus =  novoRegistro.dataReservada; 
-            
+            novoRegistro.dataModificacaoStatus = novoRegistro.dataReservada;
+    
             await this.validarDados(novoRegistro);
-            const res=await dataSource.Reserva.create(novoRegistro);
-            if(res) return {status:200, data:res};
+            const res = await dataSource.Reserva.create(novoRegistro);
+            if (res) {
+                try {
+                    await this.emailSend.enviarEmailConfirmacao(novoRegistro)
+                    .then(result => {
+                        console.log('E-mail de confirmação enviado com sucesso:', result);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao enviar e-mail de confirmação:', error);
+                    });                
+                } catch (error) {
+                    await this.salvarErro(error.name, error.message, 'Reserva', 'enviaEmailConfirmacao');
+                }
+                return { status: 200, data: res };
+            }
         } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');
             throw error;
         }
-    }
+    }    
 
     async atualizar(dadosAtualizados, id) {
         try {
