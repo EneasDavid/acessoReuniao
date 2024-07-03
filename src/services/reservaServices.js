@@ -186,24 +186,39 @@ class ReservaServices extends Services{
         }
     }
 
-    async cancelarReserva(id){
-        const cancelar={
-            statusReserva:'CANCELADO',
+    async cancelarReserva(id) {
+        const cancelar = {
+            statusReserva: 'CANCELADO',
             dataModificacaoStatus: await this.formatarData(new Date())
         };
-        try{
-            const reserva=await this.pegaUmRegistro(id);
-            if(reserva.statusReserva==='PENDENTE'){
-                const request=await dataSource.Reserva.update(cancelar, { where: { id } });
-                if(request) return {status:200, data:request}
+        try {
+            const reserva = await this.pegaUmRegistro(id);
+            if (reserva.statusReserva === 'PENDENTE') {
+                const request = await dataSource.Reserva.update(cancelar, { where: { id } });
+    
+                if (request) {
+                    try {
+                        await this.emailSend.enviarEmailCancelamento(reserva)
+                            .then(result => {
+                                console.log('E-mail de cancelamento enviado com sucesso:', result);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao enviar e-mail de cancelamento:', error);
+                            });
+                    } catch (error) {
+                        await this.salvarErro(error.name, error.message, 'Reserva', 'enviaEmailCancelamento');
+                    }
+                    return { status: 200, data: request };
+                }
             }
             await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'cancelarReserva');
-            return {status:404}
-        }catch(error){
+            return { status: 404 };
+        } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'cancelarReserva');
             throw error;
         }
     }
+    
 
     async concluirReserva(id){
         const concluir={
