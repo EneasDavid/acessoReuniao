@@ -8,6 +8,24 @@ module.exports = {
         idSala: 1,
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        observacao: 'Sala está com televisão quebrada',
+        idSala: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        observacao: '',
+        idSala: 3,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        observacao: '',
+        idSala: 4,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }], {});
   },
 
