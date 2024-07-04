@@ -3,3 +3,4 @@ database.sqlite
 whatsapp_integration/.
 bancoDeDados.sql
 modeloEntidadeRelacionamento.mwb
+.env
