@@ -1,10 +1,20 @@
-const dataSource = require('../models');
+const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 require('dotenv').config();
-const axios = require('axios');
+const dataSource = require('../models');
+const { fromIni } = require('@aws-sdk/credential-provider-ini');
 const fs = require('fs').promises;
+const path = require('path');
 
-
-class EmailServices{
+class EmailServices {
+    constructor() {
+        this.sesClient = new SESClient({
+            region: process.env.AWS_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+            }
+        });
+    }
 
     async salvarErro(exception, mensagem) {
         const erro = {
@@ -16,69 +26,92 @@ class EmailServices{
             console.log('Erro salvo com sucesso');
         } catch (error) {
             console.error('Falha ao salvar o erro no banco de dados:', error);
+            throw error;
         }
     }
-    
+
     async buscarEmail(id_reservista) {
-        // Método para buscar o email a partir do id_reservista
-        const participante = await dataSource.Participante.findOne({
+        const participante = await dataSource.Usuario.findOne({
             attributes: ['email'],
-            where: { id: id_reservista}
+            where: { id: id_reservista }
         });
-        if(!participante)
+        if (!participante) {
             throw new Error('Participante não encontrado');
-    
+        }
         return participante.email;
     }
-    
-    async enviarEmail(toUserEmail, body) {
-        // nao sei como vai funcionar o disparo do email em si entao so escrevi alguma coisa aqui como
-        // imagino que as informações seriam passadas 
-        const from = process.env.EMAIL_FROM;
-        const senha = process.env.EMAIL_SENHA;
-        const dominio = process.env.EMAIL_DOMINIO;
-        const subject = 'Confirmação de reserva - CIPT';
-    
-        return await axios.post(process.env.EMAIL_API,{
-            dominio: dominio,
-            from: from,
-            to: toUserEmail,
-            subject: subject,
-            html: body,
-            auth: {
-                username: from,
-                password: senha
-            }
-        });
-    }
-    
-    /*
-    Tentei refatorar o código ao maximo para evitar repetir os mesmos trechos de código
-    que fora definidos nos metodos acima, apenas fiz os metodos mais basicos e mais urgentes
-    que são os  de Confirmacao e Cancelamento.
-    */
 
-    async enviarEmailConfirmacao(novoRegistro){
-        try{
-            const toUserEmail = await this.buscarEmail(novoRegistro.id_reservista);
-            const body = await fs.readFile('../app/email/corpo_email/confirmacao.html', 'utf8');
-            return await this.enviarEmail(toUserEmail, body);
-        }catch(error){
+    async enviarEmail(toUserEmail, body, subject) {
+        const params = {
+            Destination: {
+                ToAddresses: [toUserEmail]
+            },
+            Message: {
+                Body: {
+                    Html: {
+                        Data: body
+                    }
+                },
+                Subject: {
+                    Data: subject
+                }
+            },
+            Source: process.env.EMAIL_FROM
+        };
+
+        try {
+            const command = new SendEmailCommand(params);
+            const result = await this.sesClient.send(command);
+            console.log('E-mail enviado com sucesso:', result);
+            return result;
+        } catch (error) {
+            console.error('Erro ao enviar e-mail:', error);
             await this.salvarErro(error.name, error.message);
             throw error;
         }
     }
 
-    async enviarEmailCancelamento(reserva){
-        try{
-            const toUserEmail = await this.buscarEmail(reserva.id_reservista);
-            const body = await fs.readFile('../app/email/corpo_email/cancelamento.html', 'utf8');
-            return await this.enviarEmail(toUserEmail, body);
-        }catch(error){
+    async embedCssInHtml(htmlPath, cssPath) {
+        try {
+            const [htmlContent, cssContent] = await Promise.all([
+                fs.readFile(htmlPath, 'utf8'),
+                fs.readFile(cssPath, 'utf8')
+            ]);
+            const htmlWithCss = htmlContent.replace('</head>', `<style>${cssContent}</style></head>`);
+            return htmlWithCss;
+        } catch (error) {
+            console.error('Erro ao ler arquivos HTML ou CSS:', error);
+            throw error;
+        }
+    }
+
+    async enviarEmailConfirmacao(novoRegistro) {
+        try {
+            const toUserEmail = await this.buscarEmail(novoRegistro.idUsuario);
+            const emailTemplatePath = path.join(__dirname, '../email/corpo_email/confirmacao.html');
+            const cssPath = path.join(__dirname, '../email/style/style.css');
+            const body = await this.embedCssInHtml(emailTemplatePath, cssPath);
+            return await this.enviarEmail(toUserEmail, body, 'Confirmação de reserva - CIPT');
+        } catch (error) {
+            console.error('Erro ao enviar e-mail de confirmação:', error);
+            await this.salvarErro(error.name, error.message);
+            throw error;
+        }
+    }
+
+    async enviarEmailCancelamento(reserva) {
+        try {
+            const toUserEmail = await this.buscarEmail(reserva.idUsuario);
+            const emailTemplatePath = path.join(__dirname, '../email/corpo_email/cancelamento.html');
+            const cssPath = path.join(__dirname, '../email/style/style.css');
+            const body = await this.embedCssInHtml(emailTemplatePath, cssPath);
+            return await this.enviarEmail(toUserEmail, body, 'Sua reserva foi cancelada - CIPT');
+        } catch (error) {
+            console.error('Erro ao enviar e-mail de cancelamento:', error);
             await this.salvarErro(error.name, error.message);
             throw error;
         }
     }
 }
-module.exports = EmailServices;
 
+module.exports = EmailServices;

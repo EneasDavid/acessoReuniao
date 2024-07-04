@@ -84,9 +84,8 @@ class ReservaController extends Controller {
 
     async concluirReserva(req, res){
         const id = req.params.id;
-        const dadosInfracao = req.body;
         try{
-            const result = await reservaServices.concluirReserva(id, dadosInfracao);
+            const result = await reservaServices.concluirReserva(id);
             switch (result.status) {
                 case 404:
                     return res.status(404).json({ message: 'Reserva não encontrada para conclusão' });
