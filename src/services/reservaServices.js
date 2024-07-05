@@ -92,9 +92,10 @@ class ReservaServices extends Services{
     
     async criaRegistro(novoRegistro) {
         try {
-            console.log(novoRegistro);
-            const response = await this.verificaDisponibilidade(novoRegistro.idSala, novoRegistro.dataReservada, novoRegistro.horaInicio);
-            if (response) return { status: 409 };
+            const disponibilidade = await this.verificaDisponibilidade(novoRegistro.idSala, novoRegistro.dataReservada, novoRegistro.horaInicio);
+            if (disponibilidade) {
+                return { status: 409 };
+            }
     
             novoRegistro.statusReserva = 'PENDENTE';
             novoRegistro.horaFimReserva = await this.gerarHoraFim(novoRegistro.horaInicio, 3);
@@ -102,16 +103,13 @@ class ReservaServices extends Services{
     
             await this.validarDados(novoRegistro);
             const res = await dataSource.Reserva.create(novoRegistro);
+    
             if (res) {
                 try {
-                    await this.emailSend.enviarEmailConfirmacao(novoRegistro)
-                    .then(result => {
-                        console.log('E-mail de confirmação enviado com sucesso:', result);
-                    })
-                    .catch(error => {
-                        console.error('Erro ao enviar e-mail de confirmação:', error);
-                    });                
+                    const result = await this.emailSend.enviarEmailConfirmacao(novoRegistro);
+                    console.log('E-mail de confirmação enviado com sucesso:', result);
                 } catch (error) {
+                    console.error('Erro ao enviar e-mail de confirmação:', error);
                     await this.salvarErro(error.name, error.message, 'Reserva', 'enviaEmailConfirmacao');
                 }
                 return { status: 200, data: res };
@@ -120,7 +118,8 @@ class ReservaServices extends Services{
             await this.salvarErro(error.name, error.message, 'Reserva', 'criaRegistro');
             throw error;
         }
-    }    
+    }
+     
 
     async atualizar(dadosAtualizados, id) {
         try {
@@ -186,24 +185,34 @@ class ReservaServices extends Services{
         }
     }
 
-    async cancelarReserva(id){
-        const cancelar={
-            statusReserva:'CANCELADO',
+    async cancelarReserva(id) {
+        const cancelar = {
+            statusReserva: 'CANCELADO',
             dataModificacaoStatus: await this.formatarData(new Date())
         };
-        try{
-            const reserva=await this.pegaUmRegistro(id);
-            if(reserva.statusReserva==='PENDENTE'){
-                const request=await dataSource.Reserva.update(cancelar, { where: { id } });
-                if(request) return {status:200, data:request}
+        
+        try {
+            const reserva = await this.pegaUmRegistro(id);
+            if (reserva.statusReserva !== 'PENDENTE') {
+                await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'cancelarReserva');
+                return { status: 404 };
             }
-            await this.salvarErro('status incorreto', 'Reserva não está PENDENTE', 'Reserva', 'cancelarReserva');
-            return {status:404}
-        }catch(error){
+            const request = await dataSource.Reserva.update(cancelar, { where: { id } });
+            if (request) {
+                try {
+                    const result = await this.emailSend.enviarEmailCancelamento(reserva);
+                    console.log('E-mail de cancelamento enviado com sucesso:', result);
+                } catch (error) {
+                    console.error('Erro ao enviar e-mail de cancelamento:', error);
+                }
+                return { status: 200, data: request };
+            }
+        } catch (error) {
             await this.salvarErro(error.name, error.message, 'Reserva', 'cancelarReserva');
             throw error;
         }
     }
+    
 
     async concluirReserva(id){
         const concluir={
